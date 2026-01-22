@@ -18,7 +18,7 @@
         </div>
     </div>
 
-    <form action="{{ route('admin.pengumuman.update', $pengumuman->id) }}" method="POST">
+    <form action="{{ route('admin.pengumuman.update', $pengumuman->id) }}" method="POST" id="form-update-pengumuman">
         @csrf
         @method('PUT')
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -75,15 +75,21 @@
                     <button type="submit" class="w-full px-4 py-3 bg-[#1e3a8a] text-white rounded-lg hover:bg-blue-800 font-medium">Simpan Perubahan</button>
                     <a href="{{ route('admin.pengumuman.index') }}" class="w-full mt-3 block text-center px-4 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200">Batal</a>
                 </div>
-                <div class="bg-red-50 border border-red-200 rounded-xl p-6">
-                    <form action="{{ route('admin.pengumuman.destroy', $pengumuman->id) }}" method="POST" onsubmit="return confirm('Yakin hapus?')">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit" class="w-full px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 text-sm">Hapus Pengumuman</button>
-                    </form>
-                </div>
             </div>
         </div>
     </form>
+
+    <!-- Delete Form - Dipindahkan keluar dari form update -->
+    <div class="mt-6">
+        <div class="bg-red-50 border border-red-200 rounded-xl p-6">
+            <h3 class="text-sm font-semibold text-red-800 mb-2">Zona Bahaya</h3>
+            <p class="text-xs text-red-600 mb-4">Menghapus pengumuman tidak dapat dibatalkan.</p>
+            <form action="{{ route('admin.pengumuman.destroy', $pengumuman->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus pengumuman ini? Tindakan ini tidak dapat dibatalkan.');">
+                @csrf
+                @method('DELETE')
+                <button type="submit" class="w-full px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 text-sm font-medium">Hapus Pengumuman</button>
+            </form>
+        </div>
+    </div>
 </div>
 @endsection

@@ -85,15 +85,24 @@ class PengumumanController extends Controller
             'status' => 'required|in:draft,published',
         ]);
 
-        $pengumuman->update([
+        $data = [
             'judul' => $request->judul,
             'isi' => $request->isi,
             'kategori' => $request->kategori,
             'is_penting' => $request->has('is_penting'),
-            'tanggal_mulai' => $request->tanggal_mulai,
-            'tanggal_selesai' => $request->tanggal_selesai,
             'status' => $request->status,
-        ]);
+        ];
+
+        // Handle field nullable - hanya update jika diisi, jika kosong tetap null
+        if ($request->has('tanggal_mulai')) {
+            $data['tanggal_mulai'] = $request->tanggal_mulai ?: null;
+        }
+
+        if ($request->has('tanggal_selesai')) {
+            $data['tanggal_selesai'] = $request->tanggal_selesai ?: null;
+        }
+
+        $pengumuman->update($data);
 
         return redirect()->route('admin.pengumuman.index')
             ->with('success', 'Pengumuman berhasil diperbarui!');
