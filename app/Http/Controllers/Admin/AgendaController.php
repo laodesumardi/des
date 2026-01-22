@@ -91,10 +91,35 @@ class AgendaController extends Controller
             'status' => 'required|in:akan_datang,berlangsung,selesai,dibatalkan',
         ]);
 
-        $agenda->update($request->only([
-            'judul', 'deskripsi', 'tanggal_mulai', 'tanggal_selesai',
-            'waktu_mulai', 'waktu_selesai', 'lokasi', 'kategori', 'status'
-        ]));
+        $data = [
+            'judul' => $request->judul,
+            'tanggal_mulai' => $request->tanggal_mulai,
+            'kategori' => $request->kategori,
+            'status' => $request->status,
+        ];
+
+        // Handle field nullable - hanya update jika diisi, jika kosong tetap null
+        if ($request->has('deskripsi')) {
+            $data['deskripsi'] = $request->deskripsi ?: null;
+        }
+
+        if ($request->has('tanggal_selesai')) {
+            $data['tanggal_selesai'] = $request->tanggal_selesai ?: null;
+        }
+
+        if ($request->has('waktu_mulai')) {
+            $data['waktu_mulai'] = $request->waktu_mulai ?: null;
+        }
+
+        if ($request->has('waktu_selesai')) {
+            $data['waktu_selesai'] = $request->waktu_selesai ?: null;
+        }
+
+        if ($request->has('lokasi')) {
+            $data['lokasi'] = $request->lokasi ?: null;
+        }
+
+        $agenda->update($data);
 
         return redirect()->route('admin.agenda.index')
             ->with('success', 'Agenda berhasil diperbarui!');
