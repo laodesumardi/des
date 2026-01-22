@@ -22,6 +22,18 @@
 @endphp
 
 @section('content')
+<!-- Animasi Teks Berjalan -->
+<div class="bg-gradient-to-r from-[#1e3a8a] via-blue-600 to-[#1e3a8a] text-white py-3 overflow-hidden relative">
+    <div class="marquee-container">
+        <div class="marquee-content">
+            <span class="marquee-text">✨ SELAMAT DATANG DI WEBSITE DESA BATU KASA ✨</span>
+            <span class="marquee-text">✨ SELAMAT DATANG DI WEBSITE DESA BATU KASA ✨</span>
+            <span class="marquee-text">✨ SELAMAT DATANG DI WEBSITE DESA BATU KASA ✨</span>
+            <span class="marquee-text">✨ SELAMAT DATANG DI WEBSITE DESA BATU KASA ✨</span>
+        </div>
+    </div>
+</div>
+
 <!-- Hero Slider -->
 <div class="relative w-full overflow-hidden bg-gray-900" style="height: 500px;">
     <div id="hero-slider" class="flex transition-transform duration-500 h-full">
@@ -302,6 +314,51 @@
 .scroll-fade.visible {
     opacity: 1;
     transform: translateY(0);
+}
+
+/* Marquee Animation */
+.marquee-container {
+    width: 100%;
+    overflow: hidden;
+    white-space: nowrap;
+    position: relative;
+}
+
+.marquee-content {
+    display: inline-flex;
+    animation: marquee 20s linear infinite;
+    will-change: transform;
+}
+
+.marquee-text {
+    display: inline-block;
+    padding: 0 50px;
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+@keyframes marquee {
+    0% {
+        transform: translateX(0);
+    }
+    100% {
+        transform: translateX(-50%);
+    }
+}
+
+/* Pause on hover */
+.marquee-container:hover .marquee-content {
+    animation-play-state: paused;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .marquee-text {
+        font-size: 14px;
+        padding: 0 30px;
+    }
 }
 </style>
 
