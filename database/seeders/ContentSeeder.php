@@ -6,6 +6,7 @@ use App\Models\Berita;
 use App\Models\Galeri;
 use App\Models\Umkm;
 use App\Models\PerangkatDesa;
+use App\Models\Agenda;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Str;
@@ -41,7 +42,10 @@ class ContentSeeder extends Seeder
         // Seed Perangkat Desa (15 items)
         $this->seedPerangkatDesa();
         
-        $this->command->info('Berhasil menambahkan 15 data untuk Berita, Galeri, UMKM, dan Perangkat Desa!');
+        // Seed Agenda (15 items)
+        $this->seedAgenda($adminUser);
+        
+        $this->command->info('Berhasil menambahkan 15 data untuk Berita, Galeri, UMKM, Perangkat Desa, dan Agenda!');
     }
 
     private function seedBerita($user)
@@ -406,6 +410,204 @@ class ContentSeeder extends Seeder
                 'nama' => $data['nama'],
                 'nip' => $data['nip'],
                 'urutan' => $data['urutan'],
+            ]);
+        }
+    }
+
+    private function seedAgenda($user)
+    {
+        $kategoriList = Agenda::getKategori();
+        $kategoriKeys = array_keys($kategoriList);
+        
+        // Generate tanggal mulai dari hari ini hingga 60 hari ke depan
+        $baseDate = Carbon::now()->startOfDay();
+        
+        $agendaData = [
+            [
+                'judul' => 'Rapat Koordinasi Bulanan',
+                'deskripsi' => 'Rapat koordinasi bulanan untuk membahas program dan kegiatan desa',
+                'tanggal_mulai' => $baseDate->copy()->addDays(2),
+                'tanggal_selesai' => null,
+                'waktu_mulai' => '09:00',
+                'waktu_selesai' => '11:00',
+                'lokasi' => 'Balai Desa',
+                'kategori' => 'rapat',
+                'status' => 'akan_datang',
+            ],
+            [
+                'judul' => 'Gotong Royong Pembersihan Lingkungan',
+                'deskripsi' => 'Kegiatan gotong royong membersihkan lingkungan desa dari sampah',
+                'tanggal_mulai' => $baseDate->copy()->addDays(5),
+                'tanggal_selesai' => null,
+                'waktu_mulai' => '07:00',
+                'waktu_selesai' => '10:00',
+                'lokasi' => 'Seluruh Wilayah Desa',
+                'kategori' => 'kegiatan',
+                'status' => 'akan_datang',
+            ],
+            [
+                'judul' => 'Musyawarah Rencana Pembangunan',
+                'deskripsi' => 'Musyawarah untuk membahas rencana pembangunan infrastruktur desa',
+                'tanggal_mulai' => $baseDate->copy()->addDays(7),
+                'tanggal_selesai' => null,
+                'waktu_mulai' => '14:00',
+                'waktu_selesai' => '16:00',
+                'lokasi' => 'Aula Balai Desa',
+                'kategori' => 'musyawarah',
+                'status' => 'akan_datang',
+            ],
+            [
+                'judul' => 'Pelatihan Kewirausahaan untuk Pemuda',
+                'deskripsi' => 'Pelatihan kewirausahaan untuk meningkatkan kemampuan pemuda dalam berbisnis',
+                'tanggal_mulai' => $baseDate->copy()->addDays(10),
+                'tanggal_selesai' => $baseDate->copy()->addDays(12),
+                'waktu_mulai' => '08:00',
+                'waktu_selesai' => '15:00',
+                'lokasi' => 'Balai Desa',
+                'kategori' => 'pelatihan',
+                'status' => 'akan_datang',
+            ],
+            [
+                'judul' => 'Kegiatan Posyandu',
+                'deskripsi' => 'Pelayanan kesehatan untuk ibu dan anak di posyandu',
+                'tanggal_mulai' => $baseDate->copy()->addDays(12),
+                'tanggal_selesai' => null,
+                'waktu_mulai' => '08:00',
+                'waktu_selesai' => '11:00',
+                'lokasi' => 'Posyandu Dusun Makmur',
+                'kategori' => 'kegiatan',
+                'status' => 'akan_datang',
+            ],
+            [
+                'judul' => 'Pengajian Rutin',
+                'deskripsi' => 'Pengajian rutin mingguan untuk meningkatkan keimanan dan ketaqwaan',
+                'tanggal_mulai' => $baseDate->copy()->addDays(14),
+                'tanggal_selesai' => null,
+                'waktu_mulai' => '19:00',
+                'waktu_selesai' => '21:00',
+                'lokasi' => 'Masjid Al-Ikhlas',
+                'kategori' => 'keagamaan',
+                'status' => 'akan_datang',
+            ],
+            [
+                'judul' => 'Bakti Sosial untuk Warga Miskin',
+                'deskripsi' => 'Kegiatan bakti sosial memberikan bantuan sembako untuk warga yang membutuhkan',
+                'tanggal_mulai' => $baseDate->copy()->addDays(18),
+                'tanggal_selesai' => null,
+                'waktu_mulai' => '09:00',
+                'waktu_selesai' => '12:00',
+                'lokasi' => 'Lapangan Desa',
+                'kategori' => 'sosial',
+                'status' => 'akan_datang',
+            ],
+            [
+                'judul' => 'Rapat Evaluasi Program Desa',
+                'deskripsi' => 'Rapat evaluasi program-program desa yang telah dilaksanakan',
+                'tanggal_mulai' => $baseDate->copy()->addDays(20),
+                'tanggal_selesai' => null,
+                'waktu_mulai' => '13:00',
+                'waktu_selesai' => '15:00',
+                'lokasi' => 'Kantor Desa',
+                'kategori' => 'rapat',
+                'status' => 'akan_datang',
+            ],
+            [
+                'judul' => 'Senam Sehat untuk Lansia',
+                'deskripsi' => 'Kegiatan senam sehat rutin untuk menjaga kebugaran lansia',
+                'tanggal_mulai' => $baseDate->copy()->addDays(21),
+                'tanggal_selesai' => null,
+                'waktu_mulai' => '06:00',
+                'waktu_selesai' => '07:30',
+                'lokasi' => 'Lapangan Desa',
+                'kategori' => 'kegiatan',
+                'status' => 'akan_datang',
+            ],
+            [
+                'judul' => 'Pelatihan Pertanian Organik',
+                'deskripsi' => 'Pelatihan teknik pertanian organik untuk meningkatkan hasil panen',
+                'tanggal_mulai' => $baseDate->copy()->addDays(25),
+                'tanggal_selesai' => $baseDate->copy()->addDays(26),
+                'waktu_mulai' => '08:00',
+                'waktu_selesai' => '16:00',
+                'lokasi' => 'Balai Desa',
+                'kategori' => 'pelatihan',
+                'status' => 'akan_datang',
+            ],
+            [
+                'judul' => 'Musyawarah Pemilihan Ketua RT',
+                'deskripsi' => 'Musyawarah untuk memilih ketua RT periode baru',
+                'tanggal_mulai' => $baseDate->copy()->addDays(28),
+                'tanggal_selesai' => null,
+                'waktu_mulai' => '19:00',
+                'waktu_selesai' => '21:00',
+                'lokasi' => 'Aula Balai Desa',
+                'kategori' => 'musyawarah',
+                'status' => 'akan_datang',
+            ],
+            [
+                'judul' => 'Festival Budaya Desa',
+                'deskripsi' => 'Festival budaya menampilkan kesenian tradisional dan kuliner khas',
+                'tanggal_mulai' => $baseDate->copy()->addDays(30),
+                'tanggal_selesai' => $baseDate->copy()->addDays(32),
+                'waktu_mulai' => '08:00',
+                'waktu_selesai' => '22:00',
+                'lokasi' => 'Lapangan Desa',
+                'kategori' => 'kegiatan',
+                'status' => 'akan_datang',
+            ],
+            [
+                'judul' => 'Kegiatan Vaksinasi Gratis',
+                'deskripsi' => 'Program vaksinasi gratis untuk seluruh warga desa',
+                'tanggal_mulai' => $baseDate->copy()->addDays(35),
+                'tanggal_selesai' => null,
+                'waktu_mulai' => '08:00',
+                'waktu_selesai' => '14:00',
+                'lokasi' => 'Balai Desa',
+                'kategori' => 'kegiatan',
+                'status' => 'akan_datang',
+            ],
+            [
+                'judul' => 'Rapat Koordinasi dengan Pemerintah Kecamatan',
+                'deskripsi' => 'Rapat koordinasi dengan pemerintah kecamatan membahas program desa',
+                'tanggal_mulai' => $baseDate->copy()->addDays(40),
+                'tanggal_selesai' => null,
+                'waktu_mulai' => '10:00',
+                'waktu_selesai' => '12:00',
+                'lokasi' => 'Kantor Kecamatan',
+                'kategori' => 'rapat',
+                'status' => 'akan_datang',
+            ],
+            [
+                'judul' => 'Kegiatan Pemberdayaan Perempuan',
+                'deskripsi' => 'Pelatihan keterampilan untuk pemberdayaan perempuan desa',
+                'tanggal_mulai' => $baseDate->copy()->addDays(45),
+                'tanggal_selesai' => $baseDate->copy()->addDays(47),
+                'waktu_mulai' => '09:00',
+                'waktu_selesai' => '15:00',
+                'lokasi' => 'Balai Desa',
+                'kategori' => 'pelatihan',
+                'status' => 'akan_datang',
+            ],
+        ];
+
+        foreach ($agendaData as $index => $data) {
+            // Cek apakah agenda dengan judul yang sama sudah ada
+            $existingAgenda = Agenda::where('judul', $data['judul'])->first();
+            if ($existingAgenda) {
+                continue; // Skip jika sudah ada
+            }
+            
+            Agenda::create([
+                'judul' => $data['judul'],
+                'deskripsi' => $data['deskripsi'],
+                'tanggal_mulai' => $data['tanggal_mulai'],
+                'tanggal_selesai' => $data['tanggal_selesai'],
+                'waktu_mulai' => $data['waktu_mulai'],
+                'waktu_selesai' => $data['waktu_selesai'],
+                'lokasi' => $data['lokasi'],
+                'kategori' => $data['kategori'],
+                'status' => $data['status'],
+                'user_id' => $user->id,
             ]);
         }
     }
