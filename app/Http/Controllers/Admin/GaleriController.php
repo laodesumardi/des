@@ -109,11 +109,15 @@ class GaleriController extends Controller
 
         $data = [
             'judul' => $request->judul,
-            'deskripsi' => $request->deskripsi,
             'kategori' => $request->kategori,
             'status' => $request->status,
             'urutan' => $request->urutan ?? 0,
         ];
+
+        // Handle deskripsi - hanya update jika diisi, jika kosong tetap null
+        if ($request->has('deskripsi')) {
+            $data['deskripsi'] = $request->deskripsi ?: null;
+        }
 
         // Handle gambar upload
         if ($request->hasFile('gambar')) {
@@ -123,6 +127,8 @@ class GaleriController extends Controller
             }
             $data['gambar'] = $this->uploadGambar($request->file('gambar'));
         }
+        // Jika tidak ada file baru, pertahankan gambar lama
+        // Gambar tetap menggunakan yang lama
 
         $galeri->update($data);
 
