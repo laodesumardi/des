@@ -88,7 +88,7 @@
                             <div class="flex items-center gap-4">
                                 <div class="w-16 h-16 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
                                     @if($item->gambar)
-                                    <img src="{{ asset('images/berita/' . $item->gambar) }}" alt="{{ $item->judul }}" class="w-full h-full object-cover">
+                                    <img src="{{ $item->gambar_url }}" alt="{{ $item->judul }}" class="w-full h-full object-cover">
                                     @else
                                     <div class="w-full h-full flex items-center justify-center bg-gray-200">
                                         <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">

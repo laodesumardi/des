@@ -103,14 +103,16 @@ class Berita extends Model
 
     /**
      * Get URL gambar dengan fallback untuk shared hosting
+     * Menggunakan Storage::url() untuk akses via symlink
      */
     public function getGambarUrlAttribute()
     {
-        return \App\Helpers\ImageHelper::getImageUrl(
-            'berita',
-            $this->gambar,
-            asset('images/default-berita.jpg')
-        );
+        if (empty($this->gambar)) {
+            return asset('images/default-berita.jpg');
+        }
+        
+        // Gunakan Storage::url() untuk akses via symlink storage
+        return \Illuminate\Support\Facades\Storage::url('images/berita/' . $this->gambar);
     }
 
     /**

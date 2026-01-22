@@ -119,7 +119,7 @@
                     
                     @if($umkm->gambar)
                     <div id="current-image" class="mb-4">
-                        <img src="{{ asset('images/umkm/' . $umkm->gambar) }}" alt="{{ $umkm->nama_usaha }}" class="max-h-48 rounded-lg border border-gray-200">
+                        <img src="{{ $umkm->gambar_url }}" alt="{{ $umkm->nama_usaha }}" class="max-h-48 rounded-lg border border-gray-200">
                         <div class="mt-2 flex items-center gap-2">
                             <label class="flex items-center gap-2 text-sm text-gray-600">
                                 <input type="checkbox" name="hapus_gambar" value="1" class="rounded border-gray-300 text-red-600 focus:ring-red-500" onchange="toggleRemoveImage(this)">

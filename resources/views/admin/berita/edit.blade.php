@@ -115,7 +115,7 @@
                         @if($berita->gambar)
                         <div id="current-gambar" class="relative">
                             <div class="w-full aspect-video rounded-lg overflow-hidden bg-gray-100">
-                                <img src="{{ asset('images/berita/' . $berita->gambar) }}" alt="{{ $berita->judul }}" class="w-full h-full object-cover">
+                                <img src="{{ $berita->gambar_url }}" alt="{{ $berita->judul }}" class="w-full h-full object-cover">
                             </div>
                             <div class="mt-2 flex items-center gap-2">
                                 <label class="flex items-center gap-2 text-sm text-gray-600">

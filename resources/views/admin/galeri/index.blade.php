@@ -72,7 +72,7 @@
         @foreach($galeri as $item)
         <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden group">
             <div class="aspect-square relative overflow-hidden">
-                <img src="{{ asset('images/galeri/' . $item->gambar) }}" alt="{{ $item->judul }}" 
+                <img src="{{ $item->gambar_url }}" alt="{{ $item->judul }}" 
                     class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
                 
                 <!-- Overlay -->

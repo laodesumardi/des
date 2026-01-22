@@ -152,7 +152,7 @@
             <article class="scroll-fade bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm hover:shadow-md hover:-translate-y-1 transition-all duration-300" style="transition-delay: {{ $index * 0.1 }}s">
                 <div class="h-44 bg-gray-100 overflow-hidden">
                     @if($berita->gambar)
-                    <img src="{{ asset('images/berita/' . $berita->gambar) }}" alt="{{ $berita->judul }}" class="w-full h-full object-cover hover:scale-105 transition-transform duration-300" onerror="this.src='https://via.placeholder.com/400x176?text=Berita'">
+                    <img src="{{ $berita->gambar_url }}" alt="{{ $berita->judul }}" class="w-full h-full object-cover hover:scale-105 transition-transform duration-300" onerror="this.src='https://via.placeholder.com/400x176?text=Berita'">
                     @else
                     <div class="w-full h-full flex items-center justify-center text-gray-300">
                         <svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"></path></svg>
@@ -192,8 +192,8 @@
     </div>
     <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
         @forelse($galeriTerbaru as $index => $galeri)
-        <div class="scroll-fade aspect-square rounded-xl overflow-hidden cursor-pointer border border-gray-200 shadow-sm hover:shadow-md hover:scale-105 transition-all duration-300" style="transition-delay: {{ $index * 0.05 }}s" onclick="openLightbox('{{ asset('images/galeri/' . $galeri->gambar) }}', '{{ $galeri->judul }}')">
-            <img src="{{ asset('images/galeri/' . $galeri->gambar) }}" alt="{{ $galeri->judul }}" class="w-full h-full object-cover" onerror="this.src='https://via.placeholder.com/300x300?text=Foto'">
+        <div class="scroll-fade aspect-square rounded-xl overflow-hidden cursor-pointer border border-gray-200 shadow-sm hover:shadow-md hover:scale-105 transition-all duration-300" style="transition-delay: {{ $index * 0.05 }}s" onclick="openLightbox('{{ $galeri->gambar_url }}', '{{ $galeri->judul }}')">
+            <img src="{{ $galeri->gambar_url }}" alt="{{ $galeri->judul }}" class="w-full h-full object-cover" onerror="this.src='https://via.placeholder.com/300x300?text=Foto'">
         </div>
         @empty
         <div class="col-span-4 text-center py-12 text-gray-400">Belum ada galeri</div>

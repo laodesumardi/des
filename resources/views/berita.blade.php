@@ -28,7 +28,7 @@
                     <div class="flex-shrink-0 w-full md:w-64">
                         <div class="aspect-video md:aspect-square bg-gray-100 overflow-hidden rounded-lg">
                             @if($item->gambar)
-                            <img src="{{ asset('images/berita/' . $item->gambar) }}" alt="{{ $item->judul }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+                            <img src="{{ $item->gambar_url }}" alt="{{ $item->judul }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
                             @else
                             <div class="w-full h-full flex items-center justify-center bg-gray-200">
                                 <svg class="w-16 h-16 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">

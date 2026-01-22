@@ -24,9 +24,9 @@
             @foreach($galeri as $index => $item)
             <div class="scroll-animate group relative bg-white border border-gray-200 rounded-lg overflow-hidden hover:border-[#1e3a8a] transition-all cursor-pointer" 
                 data-animation="scale-fade" data-delay="{{ 200 + ($index * 50) }}"
-                onclick="openLightbox('{{ asset('images/galeri/' . $item->gambar) }}', '{{ $item->judul }}', '{{ $item->deskripsi }}')">
+                onclick="openLightbox('{{ $item->gambar_url }}', '{{ $item->judul }}', '{{ $item->deskripsi }}')">
                 <div class="aspect-square bg-gray-100 overflow-hidden">
-                    <img src="{{ asset('images/galeri/' . $item->gambar) }}" alt="{{ $item->judul }}" 
+                    <img src="{{ $item->gambar_url }}" alt="{{ $item->judul }}" 
                         class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
                 </div>
                 <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-black/0 to-black/0 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>

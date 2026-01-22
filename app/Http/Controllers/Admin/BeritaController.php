@@ -4,9 +4,9 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Berita;
-use App\Helpers\ImageHelper;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class BeritaController extends Controller
@@ -172,30 +172,17 @@ class BeritaController extends Controller
 
     /**
      * Upload gambar berita
-     * Menggunakan ImageHelper untuk kompatibilitas shared hosting
+     * Menggunakan Storage disk 'public' untuk kompatibilitas shared hosting
      */
     private function uploadGambar($file)
     {
-        // Ensure subfolder exists with proper permissions
-        $imagesPath = ImageHelper::ensureSubfolderExists('berita');
-        
-        // Pastikan folder writable
-        if (!is_writable($imagesPath)) {
-            chmod($imagesPath, 0755);
-        }
-
         // Generate unique filename
         $filename = 'berita-' . time() . '-' . Str::random(10) . '.' . $file->getClientOriginalExtension();
         
-        // Move file
-        $file->move($imagesPath, $filename);
+        // Simpan ke storage/app/public/images/berita/
+        $path = $file->storeAs('images/berita', $filename, 'public');
         
-        // Set permission file (644 = readable oleh semua)
-        $filePath = $imagesPath . DIRECTORY_SEPARATOR . $filename;
-        if (file_exists($filePath)) {
-            chmod($filePath, 0644);
-        }
-
+        // Return hanya filename untuk disimpan di database
         return $filename;
     }
 
@@ -208,9 +195,7 @@ class BeritaController extends Controller
             return;
         }
         
-        $filePath = ImageHelper::getImagesPath() . DIRECTORY_SEPARATOR . 'berita' . DIRECTORY_SEPARATOR . $filename;
-        if (file_exists($filePath)) {
-            @unlink($filePath);
-        }
+        // Hapus dari storage/app/public/images/berita/
+        Storage::disk('public')->delete('images/berita/' . $filename);
     }
 }

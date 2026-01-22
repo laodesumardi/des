@@ -23,7 +23,7 @@
                     <!-- Featured Image -->
                     @if($berita->gambar)
                     <div class="aspect-video w-full overflow-hidden">
-                        <img src="{{ asset('images/berita/' . $berita->gambar) }}" alt="{{ $berita->judul }}" class="w-full h-full object-cover">
+                        <img src="{{ $berita->gambar_url }}" alt="{{ $berita->judul }}" class="w-full h-full object-cover">
                     </div>
                     @endif
 
@@ -113,7 +113,7 @@
                             <div class="flex gap-3">
                                 <div class="w-20 h-20 flex-shrink-0 bg-gray-100 rounded-lg overflow-hidden">
                                     @if($related->gambar)
-                                    <img src="{{ asset('images/berita/' . $related->gambar) }}" alt="{{ $related->judul }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+                                    <img src="{{ $related->gambar_url }}" alt="{{ $related->judul }}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
                                     @else
                                     <div class="w-full h-full flex items-center justify-center bg-gray-200">
                                         <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">

@@ -47,14 +47,16 @@ class Galeri extends Model
 
     /**
      * Get URL gambar dengan fallback untuk shared hosting
+     * Menggunakan Storage::url() untuk akses via symlink storage
      */
     public function getGambarUrlAttribute()
     {
-        return \App\Helpers\ImageHelper::getImageUrl(
-            'galeri',
-            $this->gambar,
-            asset('images/default-galeri.jpg')
-        );
+        if (empty($this->gambar)) {
+            return asset('images/default-galeri.jpg');
+        }
+        
+        // Gunakan Storage::url() untuk akses via symlink storage
+        return \Illuminate\Support\Facades\Storage::url('images/galeri/' . $this->gambar);
     }
 
     /**

@@ -328,7 +328,7 @@
                 <a href="{{ route('admin.berita.edit', $berita->id) }}" class="flex items-start gap-3 p-2 rounded-lg hover:bg-gray-50 transition-colors group">
                     <div class="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0 bg-gray-100">
                         @if($berita->gambar)
-                        <img src="{{ asset('images/berita/' . $berita->gambar) }}" alt="{{ $berita->judul }}" class="w-full h-full object-cover">
+                        <img src="{{ $berita->gambar_url }}" alt="{{ $berita->judul }}" class="w-full h-full object-cover">
                         @else
                         <div class="w-full h-full flex items-center justify-center">
                             <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -366,7 +366,7 @@
                 <a href="{{ route('admin.umkm.edit', $umkm->id) }}" class="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-50 transition-colors border border-gray-100 group">
                     <div class="w-12 h-12 rounded-lg overflow-hidden flex-shrink-0 bg-gray-100">
                         @if($umkm->gambar)
-                        <img src="{{ asset('images/umkm/' . $umkm->gambar) }}" alt="{{ $umkm->nama_usaha }}" class="w-full h-full object-cover">
+                        <img src="{{ $umkm->gambar_url }}" alt="{{ $umkm->nama_usaha }}" class="w-full h-full object-cover">
                         @else
                         <div class="w-full h-full flex items-center justify-center">
                             <svg class="w-6 h-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -399,7 +399,7 @@
                 @forelse($galeriTerbaru as $foto)
                 <a href="{{ route('admin.galeri.edit', $foto->id) }}" class="aspect-square rounded-lg overflow-hidden bg-gray-100 group relative">
                     @if($foto->gambar)
-                    <img src="{{ asset('images/galeri/' . $foto->gambar) }}" alt="{{ $foto->judul }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300">
+                    <img src="{{ $foto->gambar_url }}" alt="{{ $foto->judul }}" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300">
                     <div class="absolute inset-0 bg-black/0 group-hover:bg-black/30 transition-colors flex items-center justify-center">
                         <svg class="w-6 h-6 text-white opacity-0 group-hover:opacity-100 transition-opacity" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>

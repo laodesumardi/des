@@ -73,7 +73,7 @@
         <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden group hover:shadow-md transition-shadow">
             <div class="aspect-video relative overflow-hidden bg-gray-100">
                 @if($item->gambar)
-                <img src="{{ asset('images/umkm/' . $item->gambar) }}" alt="{{ $item->nama_usaha }}" 
+                <img src="{{ $item->gambar_url }}" alt="{{ $item->nama_usaha }}" 
                     class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
                 @else
                 <div class="w-full h-full flex items-center justify-center bg-gray-200">

@@ -4,9 +4,9 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\Galeri;
-use App\Helpers\ImageHelper;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class GaleriController extends Controller
@@ -149,30 +149,17 @@ class GaleriController extends Controller
 
     /**
      * Upload gambar galeri
-     * Menggunakan ImageHelper untuk kompatibilitas shared hosting
+     * Menggunakan Storage disk 'public' untuk kompatibilitas shared hosting
      */
     private function uploadGambar($file)
     {
-        // Ensure subfolder exists with proper permissions
-        $imagesPath = ImageHelper::ensureSubfolderExists('galeri');
-        
-        // Pastikan folder writable
-        if (!is_writable($imagesPath)) {
-            chmod($imagesPath, 0755);
-        }
-
         // Generate unique filename
         $filename = 'galeri-' . time() . '-' . Str::random(10) . '.' . $file->getClientOriginalExtension();
         
-        // Move file
-        $file->move($imagesPath, $filename);
+        // Simpan ke storage/app/public/images/galeri/
+        $path = $file->storeAs('images/galeri', $filename, 'public');
         
-        // Set permission file (644 = readable oleh semua)
-        $filePath = $imagesPath . DIRECTORY_SEPARATOR . $filename;
-        if (file_exists($filePath)) {
-            chmod($filePath, 0644);
-        }
-
+        // Return hanya filename untuk disimpan di database
         return $filename;
     }
 
@@ -185,9 +172,7 @@ class GaleriController extends Controller
             return;
         }
         
-        $filePath = ImageHelper::getImagesPath() . DIRECTORY_SEPARATOR . 'galeri' . DIRECTORY_SEPARATOR . $filename;
-        if (file_exists($filePath)) {
-            @unlink($filePath);
-        }
+        // Hapus dari storage/app/public/images/galeri/
+        Storage::disk('public')->delete('images/galeri/' . $filename);
     }
 }

@@ -32,7 +32,7 @@
                     <label class="block text-sm font-semibold text-gray-700 mb-4">Gambar Saat Ini</label>
                     
                     <div class="mb-4">
-                        <img src="{{ asset('images/galeri/' . $galeri->gambar) }}" alt="{{ $galeri->judul }}" 
+                        <img src="{{ $galeri->gambar_url }}" alt="{{ $galeri->judul }}" 
                             class="max-h-64 rounded-lg border border-gray-200" id="current-image">
                     </div>
 

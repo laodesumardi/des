@@ -105,51 +105,53 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
 Route::get('/symlink', function () {
     $results = [];
     
-    // 1. Buat symbolic link storage (untuk Laravel storage)
+    // 1. Buat symbolic link storage (PENTING untuk Storage::url())
     try {
         Artisan::call('storage:link');
         $results[] = '✅ Symbolic link storage berhasil dibuat';
     } catch (\Exception $e) {
         $results[] = '⚠️ Symbolic link storage: ' . $e->getMessage();
+        $results[] = '💡 Alternatif: Buat manual via SSH: <code>ln -s ../storage/app/public storage</code>';
     }
     
-    // 2. Buat folder images dan subfolder
-    $imagesPath = public_path('images');
+    // 2. Buat folder di storage/app/public/images/
+    $storageImagesPath = storage_path('app/public/images');
     $subfolders = ['berita', 'galeri', 'umkm', 'uploads/layanan', 'uploads/pengaduan'];
     
-    if (!is_dir($imagesPath)) {
-        mkdir($imagesPath, 0755, true);
-        $results[] = '✅ Folder images dibuat';
+    if (!is_dir($storageImagesPath)) {
+        mkdir($storageImagesPath, 0755, true);
+        $results[] = '✅ Folder storage/app/public/images dibuat';
     } else {
-        $results[] = '✅ Folder images sudah ada';
+        $results[] = '✅ Folder storage/app/public/images sudah ada';
     }
     
     foreach ($subfolders as $subfolder) {
-        $fullPath = $imagesPath . '/' . $subfolder;
+        $fullPath = $storageImagesPath . '/' . $subfolder;
         if (!is_dir($fullPath)) {
             mkdir($fullPath, 0755, true);
-            $results[] = "✅ Folder images/$subfolder dibuat";
+            $results[] = "✅ Folder storage/app/public/images/$subfolder dibuat";
         }
     }
     
     // 3. Set permission
-    if (is_dir($imagesPath)) {
-        chmod($imagesPath, 0755);
-        $results[] = '✅ Permission folder images diatur (755)';
+    if (is_dir($storageImagesPath)) {
+        chmod($storageImagesPath, 0755);
+        $results[] = '✅ Permission folder storage/app/public/images diatur (755)';
     }
     
     // 4. Verifikasi
     $storageLink = public_path('storage');
     $storageExists = is_link($storageLink) || is_dir($storageLink);
-    $imagesExists = is_dir($imagesPath);
+    $storageImagesExists = is_dir($storageImagesPath);
     
-    $html = '<!DOCTYPE html><html><head><title>Setup Symlink & Images</title>';
+    $html = '<!DOCTYPE html><html><head><title>Setup Storage Symlink</title>';
     $html .= '<style>body{font-family:Arial;max-width:800px;margin:50px auto;padding:20px;}';
     $html .= '.success{color:#28a745;background:#d4edda;padding:10px;margin:5px 0;border-radius:5px;}';
     $html .= '.error{color:#dc3545;background:#f8d7da;padding:10px;margin:5px 0;border-radius:5px;}';
     $html .= '.info{color:#17a2b8;background:#d1ecf1;padding:10px;margin:5px 0;border-radius:5px;}';
+    $html .= '.warning{color:#856404;background:#fff3cd;padding:10px;margin:5px 0;border-radius:5px;}';
     $html .= 'pre{background:#f8f9fa;padding:10px;border-radius:5px;overflow-x:auto;}</style></head><body>';
-    $html .= '<h1>🔗 Setup Symbolic Link & Folder Images</h1>';
+    $html .= '<h1>🔗 Setup Storage Symlink</h1>';
     
     foreach ($results as $result) {
         $html .= '<div class="success">' . htmlspecialchars($result) . '</div>';
@@ -158,17 +160,21 @@ Route::get('/symlink', function () {
     $html .= '<h2>📋 Verifikasi</h2>';
     
     if ($storageExists) {
-        $html .= '<div class="success">✅ Storage link/folder ada</div>';
+        $html .= '<div class="success">✅ Storage symlink ada di: <code>public/storage</code></div>';
     } else {
-        $html .= '<div class="error">❌ Storage link/folder tidak ada</div>';
+        $html .= '<div class="error">❌ Storage symlink tidak ada!</div>';
+        $html .= '<div class="warning">';
+        $html .= '<p><strong>Solusi Manual via SSH:</strong></p>';
+        $html .= '<pre>cd public_html<br>ln -s ../storage/app/public storage</pre>';
+        $html .= '</div>';
     }
     
-    if ($imagesExists) {
-        $html .= '<div class="success">✅ Folder images ada</div>';
+    if ($storageImagesExists) {
+        $html .= '<div class="success">✅ Folder storage/app/public/images ada</div>';
         
         // Cek subfolder
         foreach ($subfolders as $subfolder) {
-            $fullPath = $imagesPath . '/' . $subfolder;
+            $fullPath = $storageImagesPath . '/' . $subfolder;
             if (is_dir($fullPath)) {
                 $html .= '<div class="success">✅ Folder images/' . htmlspecialchars($subfolder) . ' ada</div>';
             } else {
@@ -176,21 +182,24 @@ Route::get('/symlink', function () {
             }
         }
     } else {
-        $html .= '<div class="error">❌ Folder images tidak ada</div>';
+        $html .= '<div class="error">❌ Folder storage/app/public/images tidak ada</div>';
     }
     
-    $html .= '<h2>📝 Catatan Penting</h2>';
+    $html .= '<h2>📝 Cara Menampilkan Gambar</h2>';
     $html .= '<div class="info">';
-    $html .= '<p><strong>Gambar disimpan di:</strong> <code>public/images/</code></p>';
-    $html .= '<p><strong>Bukan di:</strong> <code>storage/app/public</code></p>';
-    $html .= '<p>Symbolic link storage hanya untuk Laravel storage, bukan untuk gambar aplikasi.</p>';
-    $html .= '<p>Gambar aplikasi (berita, galeri, UMKM) langsung di <code>public/images/</code></p>';
+    $html .= '<p><strong>Jika file ada di:</strong> <code>storage/app/public/images/berita/foto.jpg</code></p>';
+    $html .= '<p><strong>Gunakan di Blade:</strong></p>';
+    $html .= '<pre>&lt;img src="{{ asset(\'storage/images/berita/foto.jpg\') }}" alt=""&gt;</pre>';
+    $html .= '<p><strong>Atau:</strong></p>';
+    $html .= '<pre>&lt;img src="{{ Storage::url(\'images/berita/foto.jpg\') }}" alt=""&gt;</pre>';
+    $html .= '<p><strong>Via Model Accessor:</strong></p>';
+    $html .= '<pre>&lt;img src="{{ $berita->gambar_url }}" alt=""&gt;</pre>';
     $html .= '</div>';
     
     $html .= '<h2>🔧 Jika Masih Ada Masalah</h2>';
     $html .= '<div class="info">';
-    $html .= '<p>1. Pastikan folder <code>public/images</code> ada dengan permission 755</p>';
-    $html .= '<p>2. Pastikan subfolder (berita, galeri, umkm) ada</p>';
+    $html .= '<p>1. Pastikan symlink <code>public/storage</code> → <code>storage/app/public</code> ada</p>';
+    $html .= '<p>2. Pastikan folder <code>storage/app/public/images</code> ada dengan permission 755</p>';
     $html .= '<p>3. Cek permission file gambar (harus 644 atau 755)</p>';
     $html .= '<p>4. Clear cache: <code>php artisan optimize:clear</code></p>';
     $html .= '</div>';
