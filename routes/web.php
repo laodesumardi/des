@@ -103,6 +103,103 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
 });
 
 Route::get('/symlink', function () {
-    Artisan::call('storage:link');
-    return 'Symlink Berhasil';
+    $results = [];
+    
+    // 1. Buat symbolic link storage (untuk Laravel storage)
+    try {
+        Artisan::call('storage:link');
+        $results[] = '✅ Symbolic link storage berhasil dibuat';
+    } catch (\Exception $e) {
+        $results[] = '⚠️ Symbolic link storage: ' . $e->getMessage();
+    }
+    
+    // 2. Buat folder images dan subfolder
+    $imagesPath = public_path('images');
+    $subfolders = ['berita', 'galeri', 'umkm', 'uploads/layanan', 'uploads/pengaduan'];
+    
+    if (!is_dir($imagesPath)) {
+        mkdir($imagesPath, 0755, true);
+        $results[] = '✅ Folder images dibuat';
+    } else {
+        $results[] = '✅ Folder images sudah ada';
+    }
+    
+    foreach ($subfolders as $subfolder) {
+        $fullPath = $imagesPath . '/' . $subfolder;
+        if (!is_dir($fullPath)) {
+            mkdir($fullPath, 0755, true);
+            $results[] = "✅ Folder images/$subfolder dibuat";
+        }
+    }
+    
+    // 3. Set permission
+    if (is_dir($imagesPath)) {
+        chmod($imagesPath, 0755);
+        $results[] = '✅ Permission folder images diatur (755)';
+    }
+    
+    // 4. Verifikasi
+    $storageLink = public_path('storage');
+    $storageExists = is_link($storageLink) || is_dir($storageLink);
+    $imagesExists = is_dir($imagesPath);
+    
+    $html = '<!DOCTYPE html><html><head><title>Setup Symlink & Images</title>';
+    $html .= '<style>body{font-family:Arial;max-width:800px;margin:50px auto;padding:20px;}';
+    $html .= '.success{color:#28a745;background:#d4edda;padding:10px;margin:5px 0;border-radius:5px;}';
+    $html .= '.error{color:#dc3545;background:#f8d7da;padding:10px;margin:5px 0;border-radius:5px;}';
+    $html .= '.info{color:#17a2b8;background:#d1ecf1;padding:10px;margin:5px 0;border-radius:5px;}';
+    $html .= 'pre{background:#f8f9fa;padding:10px;border-radius:5px;overflow-x:auto;}</style></head><body>';
+    $html .= '<h1>🔗 Setup Symbolic Link & Folder Images</h1>';
+    
+    foreach ($results as $result) {
+        $html .= '<div class="success">' . htmlspecialchars($result) . '</div>';
+    }
+    
+    $html .= '<h2>📋 Verifikasi</h2>';
+    
+    if ($storageExists) {
+        $html .= '<div class="success">✅ Storage link/folder ada</div>';
+    } else {
+        $html .= '<div class="error">❌ Storage link/folder tidak ada</div>';
+    }
+    
+    if ($imagesExists) {
+        $html .= '<div class="success">✅ Folder images ada</div>';
+        
+        // Cek subfolder
+        foreach ($subfolders as $subfolder) {
+            $fullPath = $imagesPath . '/' . $subfolder;
+            if (is_dir($fullPath)) {
+                $html .= '<div class="success">✅ Folder images/' . htmlspecialchars($subfolder) . ' ada</div>';
+            } else {
+                $html .= '<div class="error">❌ Folder images/' . htmlspecialchars($subfolder) . ' tidak ada</div>';
+            }
+        }
+    } else {
+        $html .= '<div class="error">❌ Folder images tidak ada</div>';
+    }
+    
+    $html .= '<h2>📝 Catatan Penting</h2>';
+    $html .= '<div class="info">';
+    $html .= '<p><strong>Gambar disimpan di:</strong> <code>public/images/</code></p>';
+    $html .= '<p><strong>Bukan di:</strong> <code>storage/app/public</code></p>';
+    $html .= '<p>Symbolic link storage hanya untuk Laravel storage, bukan untuk gambar aplikasi.</p>';
+    $html .= '<p>Gambar aplikasi (berita, galeri, UMKM) langsung di <code>public/images/</code></p>';
+    $html .= '</div>';
+    
+    $html .= '<h2>🔧 Jika Masih Ada Masalah</h2>';
+    $html .= '<div class="info">';
+    $html .= '<p>1. Pastikan folder <code>public/images</code> ada dengan permission 755</p>';
+    $html .= '<p>2. Pastikan subfolder (berita, galeri, umkm) ada</p>';
+    $html .= '<p>3. Cek permission file gambar (harus 644 atau 755)</p>';
+    $html .= '<p>4. Clear cache: <code>php artisan optimize:clear</code></p>';
+    $html .= '</div>';
+    
+    $html .= '<p style="margin-top:30px;padding:15px;background:#fff3cd;border-left:4px solid #ffc107;">';
+    $html .= '<strong>⚠️ PENTING:</strong> Hapus route /symlink setelah setup selesai untuk keamanan!';
+    $html .= '</p>';
+    
+    $html .= '</body></html>';
+    
+    return $html;
 });
