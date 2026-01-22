@@ -17,10 +17,10 @@ class PageController extends Controller
             'kepala_keluarga' => $penduduk->groupBy('rt')->count(), // Estimasi berdasarkan RT
         ];
         
-        // Ambil berita terbaru (4 berita)
+        // Ambil berita terbaru (6 berita)
         $beritaTerbaru = \App\Models\Berita::published()
             ->latest('published_at')
-            ->limit(4)
+            ->limit(6)
             ->get();
         
         // Ambil galeri terbaru (8 galeri)
