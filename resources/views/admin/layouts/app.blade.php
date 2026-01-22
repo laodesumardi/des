@@ -492,6 +492,48 @@
         </div>
     </div>
 
+    <!-- Toast Notification Container -->
+    <div id="toast-container" class="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 space-y-2 pointer-events-none"></div>
+
+    <!-- Delete Confirmation Modal -->
+    <div id="delete-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50 backdrop-blur-sm">
+        <div class="bg-white rounded-xl shadow-2xl w-[320px] mx-4 transform transition-all duration-300 scale-95 opacity-0" id="delete-modal-content">
+            <div class="p-4">
+                <!-- Icon -->
+                <div class="flex justify-center mb-3">
+                    <div class="bg-red-100 p-2.5 rounded-full">
+                        <svg class="w-8 h-8 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                        </svg>
+                    </div>
+                </div>
+                
+                <!-- Title & Message -->
+                <div class="text-center mb-4">
+                    <h3 class="text-base font-bold text-gray-900 mb-2">Konfirmasi Hapus</h3>
+                    <p class="text-xs text-gray-600 leading-relaxed px-2" id="delete-modal-message">Apakah Anda yakin ingin menghapus item ini? Tindakan ini tidak dapat dibatalkan.</p>
+                </div>
+                
+                <!-- Actions -->
+                <div class="flex gap-2">
+                    <button onclick="closeDeleteModal()" class="flex-1 px-3 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors text-xs font-medium">
+                        Batal
+                    </button>
+                    <form id="delete-modal-form" method="POST" class="flex-1">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="w-full px-3 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-xs font-medium flex items-center justify-center gap-1">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                            </svg>
+                            Hapus
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script>
         // Mobile sidebar functions
         function openMobileSidebar() {
@@ -538,6 +580,164 @@
             const btn = document.getElementById('notification-btn');
             if (dropdown && btn && !dropdown.contains(event.target) && !btn.contains(event.target)) {
                 dropdown.classList.add('hidden');
+            }
+        });
+
+        // Toast Notification System
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            if (!container) return;
+
+            const toast = document.createElement('div');
+            const toastId = 'toast-' + Date.now();
+            toast.id = toastId;
+            
+            const bgColor = type === 'success' ? 'bg-green-500' : type === 'error' ? 'bg-red-500' : 'bg-blue-500';
+            const bgLight = type === 'success' ? 'bg-white' : type === 'error' ? 'bg-white' : 'bg-white';
+            const borderColor = type === 'success' ? 'border-green-500' : type === 'error' ? 'border-red-500' : 'border-blue-500';
+            const textColor = type === 'success' ? 'text-green-800' : type === 'error' ? 'text-red-800' : 'text-blue-800';
+            const iconBg = type === 'success' ? 'bg-green-100' : type === 'error' ? 'bg-red-100' : 'bg-blue-100';
+            const iconText = type === 'success' ? 'text-green-600' : type === 'error' ? 'text-red-600' : 'text-blue-600';
+
+            toast.className = `${bgLight} ${borderColor} border-2 rounded-xl shadow-2xl p-5 flex items-center gap-4 min-w-[400px] max-w-lg transform transition-all duration-300 ease-in-out scale-0 opacity-0 pointer-events-auto`;
+            
+            const icon = type === 'success' 
+                ? '<div class="' + iconBg + ' p-3 rounded-full"><svg class="w-7 h-7 ' + iconText + ' flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg></div>'
+                : type === 'error'
+                ? '<div class="' + iconBg + ' p-3 rounded-full"><svg class="w-7 h-7 ' + iconText + ' flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg></div>'
+                : '<div class="' + iconBg + ' p-3 rounded-full"><svg class="w-7 h-7 ' + iconText + ' flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg></div>';
+
+            toast.innerHTML = `
+                ${icon}
+                <span class="${textColor} flex-1 font-semibold text-lg">${message}</span>
+                <button onclick="closeToast('${toastId}')" class="text-gray-400 hover:text-gray-600 transition-colors p-1 hover:bg-gray-100 rounded">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            `;
+
+            container.appendChild(toast);
+
+            // Trigger animation - scale and fade in
+            setTimeout(() => {
+                toast.classList.remove('scale-0', 'opacity-0');
+                toast.classList.add('scale-100', 'opacity-100');
+            }, 10);
+
+            // Auto remove after 4 seconds
+            setTimeout(() => {
+                closeToast(toastId);
+            }, 4000);
+        }
+
+        function closeToast(toastId) {
+            const toast = document.getElementById(toastId);
+            if (!toast) return;
+
+            toast.classList.add('scale-0', 'opacity-0');
+            setTimeout(() => {
+                toast.remove();
+            }, 300);
+        }
+
+        // Show toast if there's a success message from Laravel
+        @if(session('success'))
+        document.addEventListener('DOMContentLoaded', function() {
+            showToast('{{ session('success') }}', 'success');
+        });
+        @endif
+
+        // Show toast if there's an error message from Laravel
+        @if(session('error'))
+        document.addEventListener('DOMContentLoaded', function() {
+            showToast('{{ session('error') }}', 'error');
+        });
+        @endif
+
+        // Delete Confirmation Modal
+        function openDeleteModal(formId, message = 'Apakah Anda yakin ingin menghapus item ini? Tindakan ini tidak dapat dibatalkan.') {
+            const modal = document.getElementById('delete-modal');
+            const modalContent = document.getElementById('delete-modal-content');
+            const modalForm = document.getElementById('delete-modal-form');
+            const modalMessage = document.getElementById('delete-modal-message');
+            const form = document.getElementById(formId);
+            
+            if (!form || !modal) return;
+            
+            // Set message
+            modalMessage.textContent = message;
+            
+            // Copy form action and method
+            modalForm.action = form.action;
+            modalForm.method = form.method;
+            
+            // Copy CSRF token
+            const csrfToken = form.querySelector('input[name="_token"]');
+            if (csrfToken) {
+                let modalCsrf = modalForm.querySelector('input[name="_token"]');
+                if (!modalCsrf) {
+                    modalCsrf = document.createElement('input');
+                    modalCsrf.type = 'hidden';
+                    modalCsrf.name = '_token';
+                    modalForm.appendChild(modalCsrf);
+                }
+                modalCsrf.value = csrfToken.value;
+            }
+            
+            // Copy method override
+            const methodInput = form.querySelector('input[name="_method"]');
+            if (methodInput) {
+                let modalMethod = modalForm.querySelector('input[name="_method"]');
+                if (!modalMethod) {
+                    modalMethod = document.createElement('input');
+                    modalMethod.type = 'hidden';
+                    modalMethod.name = '_method';
+                    modalForm.appendChild(modalMethod);
+                }
+                modalMethod.value = methodInput.value;
+            }
+            
+            // Show modal
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            document.body.style.overflow = 'hidden';
+            
+            // Animate in
+            setTimeout(() => {
+                modalContent.classList.remove('scale-95', 'opacity-0');
+                modalContent.classList.add('scale-100', 'opacity-100');
+            }, 10);
+        }
+
+        function closeDeleteModal() {
+            const modal = document.getElementById('delete-modal');
+            const modalContent = document.getElementById('delete-modal-content');
+            
+            if (!modal) return;
+            
+            // Animate out
+            modalContent.classList.remove('scale-100', 'opacity-100');
+            modalContent.classList.add('scale-95', 'opacity-0');
+            
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+                document.body.style.overflow = '';
+            }, 300);
+        }
+
+        // Close modal on escape key
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closeDeleteModal();
+            }
+        });
+
+        // Close modal when clicking outside
+        document.getElementById('delete-modal')?.addEventListener('click', function(event) {
+            if (event.target === this) {
+                closeDeleteModal();
             }
         });
     </script>
