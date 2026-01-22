@@ -102,8 +102,8 @@ class Berita extends Model
     }
 
     /**
-     * Get URL gambar dengan fallback untuk shared hosting
-     * Menggunakan Storage::url() untuk akses via symlink
+     * Get URL gambar dengan fallback
+     * Menggunakan asset() untuk akses langsung dari public/images/
      */
     public function getGambarUrlAttribute()
     {
@@ -111,8 +111,8 @@ class Berita extends Model
             return asset('images/default-berita.jpg');
         }
         
-        // Gunakan Storage::url() untuk akses via symlink storage
-        return \Illuminate\Support\Facades\Storage::url('images/berita/' . $this->gambar);
+        // Gunakan asset() untuk akses langsung dari public/images/berita/
+        return asset('images/berita/' . $this->gambar);
     }
 
     /**

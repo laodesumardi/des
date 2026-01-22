@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Models\Umkm;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class UmkmController extends Controller
@@ -174,15 +173,20 @@ class UmkmController extends Controller
 
     /**
      * Upload gambar umkm
-     * Menggunakan Storage disk 'public' untuk kompatibilitas shared hosting
+     * Menyimpan langsung ke public/images/umkm/ untuk akses langsung tanpa symlink
      */
     private function uploadGambar($file)
     {
         // Generate unique filename
         $filename = 'umkm-' . time() . '-' . Str::random(10) . '.' . $file->getClientOriginalExtension();
         
-        // Simpan ke storage/app/public/images/umkm/
-        $path = $file->storeAs('images/umkm', $filename, 'public');
+        // Simpan langsung ke public/images/umkm/
+        $destinationPath = public_path('images/umkm');
+        if (!is_dir($destinationPath)) {
+            mkdir($destinationPath, 0755, true);
+        }
+        
+        $file->move($destinationPath, $filename);
         
         // Return hanya filename untuk disimpan di database
         return $filename;
@@ -197,7 +201,10 @@ class UmkmController extends Controller
             return;
         }
         
-        // Hapus dari storage/app/public/images/umkm/
-        Storage::disk('public')->delete('images/umkm/' . $filename);
+        // Hapus dari public/images/umkm/
+        $filePath = public_path('images/umkm/' . $filename);
+        if (file_exists($filePath)) {
+            unlink($filePath);
+        }
     }
 }

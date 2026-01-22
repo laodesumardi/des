@@ -54,8 +54,8 @@ class Umkm extends Model
     }
 
     /**
-     * Get URL gambar dengan fallback untuk shared hosting
-     * Menggunakan Storage::url() untuk akses via symlink storage
+     * Get URL gambar dengan fallback
+     * Menggunakan asset() untuk akses langsung dari public/images/
      */
     public function getGambarUrlAttribute()
     {
@@ -63,8 +63,8 @@ class Umkm extends Model
             return asset('images/default-umkm.jpg');
         }
         
-        // Gunakan Storage::url() untuk akses via symlink storage
-        return \Illuminate\Support\Facades\Storage::url('images/umkm/' . $this->gambar);
+        // Gunakan asset() untuk akses langsung dari public/images/umkm/
+        return asset('images/umkm/' . $this->gambar);
     }
 
     /**

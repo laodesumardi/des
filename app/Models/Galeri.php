@@ -46,8 +46,8 @@ class Galeri extends Model
     }
 
     /**
-     * Get URL gambar dengan fallback untuk shared hosting
-     * Menggunakan Storage::url() untuk akses via symlink storage
+     * Get URL gambar dengan fallback
+     * Menggunakan asset() untuk akses langsung dari public/images/
      */
     public function getGambarUrlAttribute()
     {
@@ -55,8 +55,8 @@ class Galeri extends Model
             return asset('images/default-galeri.jpg');
         }
         
-        // Gunakan Storage::url() untuk akses via symlink storage
-        return \Illuminate\Support\Facades\Storage::url('images/galeri/' . $this->gambar);
+        // Gunakan asset() untuk akses langsung dari public/images/galeri/
+        return asset('images/galeri/' . $this->gambar);
     }
 
     /**

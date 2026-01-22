@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Models\Galeri;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class GaleriController extends Controller
@@ -149,15 +148,20 @@ class GaleriController extends Controller
 
     /**
      * Upload gambar galeri
-     * Menggunakan Storage disk 'public' untuk kompatibilitas shared hosting
+     * Menyimpan langsung ke public/images/galeri/ untuk akses langsung tanpa symlink
      */
     private function uploadGambar($file)
     {
         // Generate unique filename
         $filename = 'galeri-' . time() . '-' . Str::random(10) . '.' . $file->getClientOriginalExtension();
         
-        // Simpan ke storage/app/public/images/galeri/
-        $path = $file->storeAs('images/galeri', $filename, 'public');
+        // Simpan langsung ke public/images/galeri/
+        $destinationPath = public_path('images/galeri');
+        if (!is_dir($destinationPath)) {
+            mkdir($destinationPath, 0755, true);
+        }
+        
+        $file->move($destinationPath, $filename);
         
         // Return hanya filename untuk disimpan di database
         return $filename;
@@ -172,7 +176,10 @@ class GaleriController extends Controller
             return;
         }
         
-        // Hapus dari storage/app/public/images/galeri/
-        Storage::disk('public')->delete('images/galeri/' . $filename);
+        // Hapus dari public/images/galeri/
+        $filePath = public_path('images/galeri/' . $filename);
+        if (file_exists($filePath)) {
+            unlink($filePath);
+        }
     }
 }

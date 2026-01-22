@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Models\Berita;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class BeritaController extends Controller
@@ -172,15 +171,20 @@ class BeritaController extends Controller
 
     /**
      * Upload gambar berita
-     * Menggunakan Storage disk 'public' untuk kompatibilitas shared hosting
+     * Menyimpan langsung ke public/images/berita/ untuk akses langsung tanpa symlink
      */
     private function uploadGambar($file)
     {
         // Generate unique filename
         $filename = 'berita-' . time() . '-' . Str::random(10) . '.' . $file->getClientOriginalExtension();
         
-        // Simpan ke storage/app/public/images/berita/
-        $path = $file->storeAs('images/berita', $filename, 'public');
+        // Simpan langsung ke public/images/berita/
+        $destinationPath = public_path('images/berita');
+        if (!is_dir($destinationPath)) {
+            mkdir($destinationPath, 0755, true);
+        }
+        
+        $file->move($destinationPath, $filename);
         
         // Return hanya filename untuk disimpan di database
         return $filename;
@@ -195,7 +199,10 @@ class BeritaController extends Controller
             return;
         }
         
-        // Hapus dari storage/app/public/images/berita/
-        Storage::disk('public')->delete('images/berita/' . $filename);
+        // Hapus dari public/images/berita/
+        $filePath = public_path('images/berita/' . $filename);
+        if (file_exists($filePath)) {
+            unlink($filePath);
+        }
     }
 }
