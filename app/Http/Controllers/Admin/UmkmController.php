@@ -123,14 +123,26 @@ class UmkmController extends Controller
         $data = [
             'nama_usaha' => $request->nama_usaha,
             'nama_pemilik' => $request->nama_pemilik,
-            'deskripsi' => $request->deskripsi,
-            'alamat' => $request->alamat,
             'whatsapp' => $request->whatsapp,
             'kategori' => $request->kategori,
-            'harga_mulai' => $request->harga_mulai,
             'status' => $request->status,
             'urutan' => $request->urutan ?? 0,
         ];
+
+        // Handle deskripsi - hanya update jika diisi, jika kosong tetap null
+        if ($request->has('deskripsi')) {
+            $data['deskripsi'] = $request->deskripsi ?: null;
+        }
+
+        // Handle alamat - hanya update jika diisi, jika kosong tetap null
+        if ($request->has('alamat')) {
+            $data['alamat'] = $request->alamat ?: null;
+        }
+
+        // Handle harga_mulai - hanya update jika diisi, jika kosong tetap null
+        if ($request->has('harga_mulai')) {
+            $data['harga_mulai'] = $request->harga_mulai ?: null;
+        }
 
         // Handle gambar upload
         if ($request->hasFile('gambar')) {
@@ -141,12 +153,17 @@ class UmkmController extends Controller
             $data['gambar'] = $this->uploadGambar($request->file('gambar'));
         }
 
-        // Handle remove gambar
-        if ($request->has('hapus_gambar') && $request->hapus_gambar) {
+        // Handle remove gambar - hanya jika checkbox dicentang
+        if ($request->has('hapus_gambar') && $request->hapus_gambar == '1') {
             if ($umkm->gambar) {
                 $this->deleteGambar($umkm->gambar);
             }
             $data['gambar'] = null;
+        }
+        // Jika tidak ada file baru dan tidak ada checkbox hapus, pertahankan gambar lama
+        elseif (!$request->hasFile('gambar')) {
+            // Jangan ubah gambar jika tidak ada perubahan
+            // Gambar tetap menggunakan yang lama
         }
 
         $umkm->update($data);
