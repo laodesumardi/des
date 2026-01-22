@@ -55,8 +55,17 @@ class Galeri extends Model
             return asset('images/default-galeri.jpg');
         }
         
+        // Pastikan path benar dan file exists
+        $imagePath = 'images/galeri/' . $this->gambar;
+        $fullPath = public_path($imagePath);
+        
+        // Jika file tidak ada, return default
+        if (!file_exists($fullPath)) {
+            return asset('images/default-galeri.jpg');
+        }
+        
         // Gunakan asset() untuk akses langsung dari public/images/galeri/
-        return asset('images/galeri/' . $this->gambar);
+        return asset($imagePath);
     }
 
     /**

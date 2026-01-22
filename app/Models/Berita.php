@@ -111,8 +111,17 @@ class Berita extends Model
             return asset('images/default-berita.jpg');
         }
         
+        // Pastikan path benar dan file exists
+        $imagePath = 'images/berita/' . $this->gambar;
+        $fullPath = public_path($imagePath);
+        
+        // Jika file tidak ada, return default
+        if (!file_exists($fullPath)) {
+            return asset('images/default-berita.jpg');
+        }
+        
         // Gunakan asset() untuk akses langsung dari public/images/berita/
-        return asset('images/berita/' . $this->gambar);
+        return asset($imagePath);
     }
 
     /**

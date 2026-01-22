@@ -31,6 +31,84 @@ Route::post('/pengaduan', [PageController::class, 'storePengaduan'])->name('peng
 // Infografis Routes
 Route::get('/infografis/penduduk', [PageController::class, 'infografisPenduduk'])->name('infografis.penduduk');
 
+// Debug Route - HAPUS SETELAH SELESAI DEBUG
+Route::get('/debug-gambar', function () {
+    $results = [];
+    
+    // Cek Berita
+    $berita = \App\Models\Berita::whereNotNull('gambar')->limit(3)->get();
+    $results['berita'] = [];
+    foreach ($berita as $b) {
+        $filePath = public_path('images/berita/' . $b->gambar);
+        $results['berita'][] = [
+            'id' => $b->id,
+            'judul' => $b->judul,
+            'gambar_db' => $b->gambar,
+            'gambar_url' => $b->gambar_url,
+            'file_exists' => file_exists($filePath),
+            'file_path' => $filePath,
+        ];
+    }
+    
+    // Cek Galeri
+    $galeri = \App\Models\Galeri::whereNotNull('gambar')->limit(3)->get();
+    $results['galeri'] = [];
+    foreach ($galeri as $g) {
+        $filePath = public_path('images/galeri/' . $g->gambar);
+        $results['galeri'][] = [
+            'id' => $g->id,
+            'judul' => $g->judul,
+            'gambar_db' => $g->gambar,
+            'gambar_url' => $g->gambar_url,
+            'file_exists' => file_exists($filePath),
+            'file_path' => $filePath,
+        ];
+    }
+    
+    // Cek UMKM
+    $umkm = \App\Models\Umkm::whereNotNull('gambar')->limit(3)->get();
+    $results['umkm'] = [];
+    foreach ($umkm as $u) {
+        $filePath = public_path('images/umkm/' . $u->gambar);
+        $results['umkm'][] = [
+            'id' => $u->id,
+            'nama_usaha' => $u->nama_usaha,
+            'gambar_db' => $u->gambar,
+            'gambar_url' => $u->gambar_url,
+            'file_exists' => file_exists($filePath),
+            'file_path' => $filePath,
+        ];
+    }
+    
+    // Cek APP_URL
+    $results['app_url'] = config('app.url');
+    $results['asset_test'] = asset('images/test.jpg');
+    
+    // List files di folder
+    $results['files_berita'] = [];
+    $beritaPath = public_path('images/berita');
+    if (is_dir($beritaPath)) {
+        $files = glob($beritaPath . '/*');
+        $results['files_berita'] = array_map('basename', array_slice($files, 0, 5));
+    }
+    
+    $results['files_galeri'] = [];
+    $galeriPath = public_path('images/galeri');
+    if (is_dir($galeriPath)) {
+        $files = glob($galeriPath . '/*');
+        $results['files_galeri'] = array_map('basename', array_slice($files, 0, 5));
+    }
+    
+    $results['files_umkm'] = [];
+    $umkmPath = public_path('images/umkm');
+    if (is_dir($umkmPath)) {
+        $files = glob($umkmPath . '/*');
+        $results['files_umkm'] = array_map('basename', array_slice($files, 0, 5));
+    }
+    
+    return response()->json($results, 200, [], JSON_PRETTY_PRINT);
+});
+
 // Admin Login Routes (Guest)
 Route::middleware('guest')->group(function () {
     Route::get('/admin/login', [AuthController::class, 'showLoginForm'])->name('admin.login');

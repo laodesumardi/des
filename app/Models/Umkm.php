@@ -63,8 +63,17 @@ class Umkm extends Model
             return asset('images/default-umkm.jpg');
         }
         
+        // Pastikan path benar dan file exists
+        $imagePath = 'images/umkm/' . $this->gambar;
+        $fullPath = public_path($imagePath);
+        
+        // Jika file tidak ada, return default
+        if (!file_exists($fullPath)) {
+            return asset('images/default-umkm.jpg');
+        }
+        
         // Gunakan asset() untuk akses langsung dari public/images/umkm/
-        return asset('images/umkm/' . $this->gambar);
+        return asset($imagePath);
     }
 
     /**
