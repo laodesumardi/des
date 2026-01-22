@@ -54,14 +54,15 @@ class Umkm extends Model
     }
 
     /**
-     * Get URL gambar
+     * Get URL gambar dengan fallback untuk shared hosting
      */
     public function getGambarUrlAttribute()
     {
-        if ($this->gambar) {
-            return asset('images/umkm/' . $this->gambar);
-        }
-        return asset('images/default-umkm.jpg');
+        return \App\Helpers\ImageHelper::getImageUrl(
+            'umkm',
+            $this->gambar,
+            asset('images/default-umkm.jpg')
+        );
     }
 
     /**

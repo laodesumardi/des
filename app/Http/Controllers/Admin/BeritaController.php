@@ -172,15 +172,12 @@ class BeritaController extends Controller
 
     /**
      * Upload gambar berita
+     * Menggunakan ImageHelper untuk kompatibilitas shared hosting
      */
     private function uploadGambar($file)
     {
-        $imagesPath = ImageHelper::getImagesPath() . DIRECTORY_SEPARATOR . 'berita';
-        
-        // Create berita folder if not exists
-        if (!is_dir($imagesPath)) {
-            mkdir($imagesPath, 0755, true);
-        }
+        // Ensure subfolder exists with proper permissions
+        $imagesPath = ImageHelper::ensureSubfolderExists('berita');
 
         // Generate unique filename
         $filename = 'berita-' . time() . '-' . Str::random(10) . '.' . $file->getClientOriginalExtension();
@@ -196,9 +193,13 @@ class BeritaController extends Controller
      */
     private function deleteGambar($filename)
     {
+        if (empty($filename)) {
+            return;
+        }
+        
         $filePath = ImageHelper::getImagesPath() . DIRECTORY_SEPARATOR . 'berita' . DIRECTORY_SEPARATOR . $filename;
         if (file_exists($filePath)) {
-            unlink($filePath);
+            @unlink($filePath);
         }
     }
 }

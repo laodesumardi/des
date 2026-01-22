@@ -79,6 +79,58 @@
         </div>
     </div>
 
+    <!-- Pengajuan Layanan Stats Row -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 sm:p-6 mb-6 sm:mb-8">
+        <div class="flex items-center justify-between mb-4">
+            <h3 class="text-lg font-semibold text-gray-900">Pengajuan Layanan</h3>
+            <a href="{{ route('admin.pengajuan-layanan.index') }}" class="text-sm text-[#1e3a8a] hover:underline">Kelola Pengajuan</a>
+        </div>
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            <div class="bg-gray-50 rounded-lg p-4 text-center">
+                <p class="text-3xl font-bold text-gray-900">{{ $stats['total_pengajuan_layanan'] }}</p>
+                <p class="text-sm text-gray-500">Total Pengajuan</p>
+            </div>
+            <div class="bg-yellow-50 rounded-lg p-4 text-center border border-yellow-200">
+                <p class="text-3xl font-bold text-yellow-600">{{ $stats['pengajuan_layanan_masuk'] }}</p>
+                <p class="text-sm text-yellow-700">Menunggu</p>
+            </div>
+            <div class="bg-blue-50 rounded-lg p-4 text-center border border-blue-200">
+                <p class="text-3xl font-bold text-blue-600">{{ $stats['pengajuan_layanan_diproses'] }}</p>
+                <p class="text-sm text-blue-700">Diproses</p>
+            </div>
+            <div class="bg-green-50 rounded-lg p-4 text-center border border-green-200">
+                <p class="text-3xl font-bold text-green-600">{{ $stats['pengajuan_layanan_selesai'] }}</p>
+                <p class="text-sm text-green-700">Selesai</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Pengaduan Stats Row -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 sm:p-6 mb-6 sm:mb-8">
+        <div class="flex items-center justify-between mb-4">
+            <h3 class="text-lg font-semibold text-gray-900">Pengaduan & Aspirasi Masyarakat</h3>
+            <a href="{{ route('admin.pengaduan.index') }}" class="text-sm text-[#1e3a8a] hover:underline">Kelola Pengaduan</a>
+        </div>
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            <div class="bg-gray-50 rounded-lg p-4 text-center">
+                <p class="text-3xl font-bold text-gray-900">{{ $stats['total_pengaduan'] }}</p>
+                <p class="text-sm text-gray-500">Total Pengaduan</p>
+            </div>
+            <div class="bg-yellow-50 rounded-lg p-4 text-center border border-yellow-200">
+                <p class="text-3xl font-bold text-yellow-600">{{ $stats['pengaduan_masuk'] }}</p>
+                <p class="text-sm text-yellow-700">Menunggu</p>
+            </div>
+            <div class="bg-blue-50 rounded-lg p-4 text-center border border-blue-200">
+                <p class="text-3xl font-bold text-blue-600">{{ $stats['pengaduan_diproses'] }}</p>
+                <p class="text-sm text-blue-700">Diproses</p>
+            </div>
+            <div class="bg-green-50 rounded-lg p-4 text-center border border-green-200">
+                <p class="text-3xl font-bold text-green-600">{{ $stats['pengaduan_selesai'] }}</p>
+                <p class="text-sm text-green-700">Selesai</p>
+            </div>
+        </div>
+    </div>
+
     <!-- Additional Stats Row -->
     <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-6 sm:mb-8">
         <div class="bg-gradient-to-br from-[#1e3a8a] to-blue-700 rounded-xl p-4 sm:p-6 text-white">
@@ -141,8 +193,8 @@
         <!-- Grafik Jenis Kelamin -->
         <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 sm:p-6">
             <h3 class="text-lg font-semibold text-gray-900 mb-4">Komposisi Penduduk</h3>
-            <div class="flex items-center justify-center">
-                <canvas id="genderChart" class="max-w-[280px]"></canvas>
+            <div class="flex items-center justify-center" style="height: 200px;">
+                <canvas id="genderChart"></canvas>
             </div>
             <div class="flex justify-center gap-6 mt-4">
                 <div class="flex items-center gap-2">
@@ -368,6 +420,150 @@
             </div>
         </div>
     </div>
+
+    <!-- Pengajuan Layanan Terbaru -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 sm:p-6 mt-6">
+        <div class="flex items-center justify-between mb-4">
+            <h3 class="text-lg font-semibold text-gray-900">Pengajuan Layanan Terbaru</h3>
+            <a href="{{ route('admin.pengajuan-layanan.index') }}" class="text-sm text-[#1e3a8a] hover:underline">Lihat Semua</a>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="w-full">
+                <thead>
+                    <tr class="bg-gray-50">
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Pengirim</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Jenis Layanan</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">NIK</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Tanggal</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Status</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100">
+                    @forelse($pengajuanLayananTerbaru as $pengajuan)
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-4 py-3">
+                            <div>
+                                <p class="text-sm font-medium text-gray-900">{{ $pengajuan->nama }}</p>
+                                <p class="text-xs text-gray-500">{{ $pengajuan->telepon }}</p>
+                            </div>
+                        </td>
+                        <td class="px-4 py-3">
+                            <span class="px-2 py-1 text-xs font-medium bg-blue-100 text-blue-700 rounded-full">{{ $pengajuan->jenis_layanan_label }}</span>
+                        </td>
+                        <td class="px-4 py-3">
+                            <p class="text-sm text-gray-900">{{ $pengajuan->nik }}</p>
+                        </td>
+                        <td class="px-4 py-3">
+                            <p class="text-sm text-gray-500">{{ $pengajuan->created_at->format('d M Y') }}</p>
+                            <p class="text-xs text-gray-400">{{ $pengajuan->created_at->format('H:i') }}</p>
+                        </td>
+                        <td class="px-4 py-3">
+                            @php
+                                $statusColors = [
+                                    'masuk' => 'bg-yellow-100 text-yellow-700',
+                                    'diproses' => 'bg-blue-100 text-blue-700',
+                                    'selesai' => 'bg-green-100 text-green-700',
+                                    'ditolak' => 'bg-red-100 text-red-700',
+                                ];
+                            @endphp
+                            <span class="px-2 py-1 text-xs font-medium rounded-full {{ $statusColors[$pengajuan->status] ?? 'bg-gray-100 text-gray-700' }}">
+                                {{ $pengajuan->status_label }}
+                            </span>
+                        </td>
+                        <td class="px-4 py-3">
+                            <a href="{{ route('admin.pengajuan-layanan.show', $pengajuan->id) }}" class="inline-flex items-center gap-1 text-sm text-[#1e3a8a] hover:underline">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                                </svg>
+                                Lihat
+                            </a>
+                        </td>
+                    </tr>
+                    @empty
+                    <tr>
+                        <td colspan="6" class="px-4 py-8 text-center text-sm text-gray-500">
+                            Belum ada pengajuan layanan masuk
+                        </td>
+                    </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Pengaduan Terbaru -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 sm:p-6 mt-6">
+        <div class="flex items-center justify-between mb-4">
+            <h3 class="text-lg font-semibold text-gray-900">Pengaduan & Aspirasi Terbaru</h3>
+            <a href="{{ route('admin.pengaduan.index') }}" class="text-sm text-[#1e3a8a] hover:underline">Lihat Semua</a>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="w-full">
+                <thead>
+                    <tr class="bg-gray-50">
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Pengirim</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Judul</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Kategori</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Tanggal</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Status</th>
+                        <th class="px-4 py-3 text-left text-xs font-semibold text-gray-600 uppercase">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-100">
+                    @forelse($pengaduanTerbaru as $pengaduan)
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-4 py-3">
+                            <div>
+                                <p class="text-sm font-medium text-gray-900">{{ $pengaduan->nama }}</p>
+                                <p class="text-xs text-gray-500">{{ $pengaduan->telepon }}</p>
+                            </div>
+                        </td>
+                        <td class="px-4 py-3">
+                            <p class="text-sm text-gray-900 truncate max-w-[200px]">{{ $pengaduan->judul }}</p>
+                        </td>
+                        <td class="px-4 py-3">
+                            <span class="px-2 py-1 text-xs font-medium bg-gray-100 text-gray-700 rounded-full">{{ \App\Models\Pengaduan::getKategori()[$pengaduan->kategori] ?? $pengaduan->kategori }}</span>
+                        </td>
+                        <td class="px-4 py-3">
+                            <p class="text-sm text-gray-500">{{ $pengaduan->created_at->format('d M Y') }}</p>
+                            <p class="text-xs text-gray-400">{{ $pengaduan->created_at->format('H:i') }}</p>
+                        </td>
+                        <td class="px-4 py-3">
+                            @php
+                                $statusColors = [
+                                    'masuk' => 'bg-yellow-100 text-yellow-700',
+                                    'diproses' => 'bg-blue-100 text-blue-700',
+                                    'selesai' => 'bg-green-100 text-green-700',
+                                    'ditolak' => 'bg-red-100 text-red-700',
+                                ];
+                            @endphp
+                            <span class="px-2 py-1 text-xs font-medium rounded-full {{ $statusColors[$pengaduan->status] ?? 'bg-gray-100 text-gray-700' }}">
+                                {{ $pengaduan->status_label }}
+                            </span>
+                        </td>
+                        <td class="px-4 py-3">
+                            <a href="{{ route('admin.pengaduan.show', $pengaduan->id) }}" class="inline-flex items-center gap-1 text-sm text-[#1e3a8a] hover:underline">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                                </svg>
+                                Lihat
+                            </a>
+                        </td>
+                    </tr>
+                    @empty
+                    <tr>
+                        <td colspan="6" class="px-4 py-8 text-center text-sm text-gray-500">
+                            Belum ada pengaduan masuk
+                        </td>
+                    </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+    </div>
 </div>
 
 <!-- Chart.js CDN -->
@@ -397,18 +593,18 @@ document.addEventListener('DOMContentLoaded', function() {
                 data: [{{ $pendudukStats['laki_laki'] }}, {{ $pendudukStats['perempuan'] }}],
                 backgroundColor: [colors.blue, colors.pink],
                 borderWidth: 0,
-                hoverOffset: 10
+                hoverOffset: 8
             }]
         },
         options: {
             responsive: true,
-            maintainAspectRatio: true,
+            maintainAspectRatio: false,
             plugins: {
                 legend: {
                     display: false
                 }
             },
-            cutout: '65%'
+            cutout: '60%'
         }
     });
 

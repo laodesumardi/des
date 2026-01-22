@@ -8,6 +8,8 @@ use App\Models\Galeri;
 use App\Models\Umkm;
 use App\Models\Penduduk;
 use App\Models\PerangkatDesa;
+use App\Models\Pengaduan;
+use App\Models\PengajuanLayanan;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 
@@ -26,6 +28,14 @@ class DashboardController extends Controller
             'total_umkm_published' => Umkm::where('status', 'published')->count(),
             'total_perangkat' => PerangkatDesa::count(),
             'total_views' => Berita::sum('views'),
+            'total_pengaduan' => Pengaduan::count(),
+            'pengaduan_masuk' => Pengaduan::where('status', 'masuk')->count(),
+            'pengaduan_diproses' => Pengaduan::where('status', 'diproses')->count(),
+            'pengaduan_selesai' => Pengaduan::where('status', 'selesai')->count(),
+            'total_pengajuan_layanan' => PengajuanLayanan::count(),
+            'pengajuan_layanan_masuk' => PengajuanLayanan::where('status', 'masuk')->count(),
+            'pengajuan_layanan_diproses' => PengajuanLayanan::where('status', 'diproses')->count(),
+            'pengajuan_layanan_selesai' => PengajuanLayanan::where('status', 'selesai')->count(),
         ];
 
         // Statistik Penduduk
@@ -118,8 +128,20 @@ class DashboardController extends Controller
             ]);
         });
 
-        // Sort by time and take 8
-        $aktivitas = $aktivitas->sortByDesc('time')->take(8)->values();
+        // Pengaduan activities
+        Pengaduan::latest()->take(3)->get()->each(function ($item) use ($aktivitas) {
+            $aktivitas->push([
+                'type' => 'pengaduan',
+                'title' => $item->judul,
+                'action' => 'Pengaduan masuk',
+                'time' => $item->created_at,
+                'icon' => 'chat',
+                'color' => 'red',
+            ]);
+        });
+
+        // Sort by time and take 10
+        $aktivitas = $aktivitas->sortByDesc('time')->take(10)->values();
 
         // Data untuk grafik berita per bulan (6 bulan terakhir)
         $beritaPerBulan = [];
@@ -142,6 +164,16 @@ class DashboardController extends Controller
             ->pluck('total', 'rt')
             ->toArray();
 
+        // Pengaduan Terbaru
+        $pengaduanTerbaru = Pengaduan::latest()
+            ->take(5)
+            ->get();
+
+        // Pengajuan Layanan Terbaru
+        $pengajuanLayananTerbaru = PengajuanLayanan::latest()
+            ->take(5)
+            ->get();
+
         return view('admin.dashboard', compact(
             'stats',
             'pendudukStats',
@@ -154,7 +186,9 @@ class DashboardController extends Controller
             'galeriTerbaru',
             'aktivitas',
             'beritaPerBulan',
-            'pendudukPerRT'
+            'pendudukPerRT',
+            'pengaduanTerbaru',
+            'pengajuanLayananTerbaru'
         ));
     }
 }

@@ -21,3 +21,22 @@ yarn-error.log
 /.nova
 /.vscode
 /.zed
+
+# Upload files
+/public/uploads
+/public/images/*.png
+/public/images/*.jpg
+/public/images/*.jpeg
+/public/images/berita/*
+/public/images/galeri/*
+/public/images/umkm/*
+/public/images/perangkat-*
+/public/images/kepala-desa-*
+/public/images/logo-*
+/public/images/favicon-*
+
+# Keep folder structure but ignore files
+!/public/images/berita/.gitkeep
+!/public/images/galeri/.gitkeep
+!/public/images/umkm/.gitkeep
+!/public/uploads/.gitkeep

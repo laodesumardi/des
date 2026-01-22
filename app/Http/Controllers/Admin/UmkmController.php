@@ -174,15 +174,12 @@ class UmkmController extends Controller
 
     /**
      * Upload gambar umkm
+     * Menggunakan ImageHelper untuk kompatibilitas shared hosting
      */
     private function uploadGambar($file)
     {
-        $imagesPath = ImageHelper::getImagesPath() . DIRECTORY_SEPARATOR . 'umkm';
-        
-        // Create umkm folder if not exists
-        if (!is_dir($imagesPath)) {
-            mkdir($imagesPath, 0755, true);
-        }
+        // Ensure subfolder exists with proper permissions
+        $imagesPath = ImageHelper::ensureSubfolderExists('umkm');
 
         // Generate unique filename
         $filename = 'umkm-' . time() . '-' . Str::random(10) . '.' . $file->getClientOriginalExtension();
@@ -198,9 +195,13 @@ class UmkmController extends Controller
      */
     private function deleteGambar($filename)
     {
+        if (empty($filename)) {
+            return;
+        }
+        
         $filePath = ImageHelper::getImagesPath() . DIRECTORY_SEPARATOR . 'umkm' . DIRECTORY_SEPARATOR . $filename;
         if (file_exists($filePath)) {
-            unlink($filePath);
+            @unlink($filePath);
         }
     }
 }

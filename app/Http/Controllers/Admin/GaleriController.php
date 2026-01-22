@@ -149,15 +149,12 @@ class GaleriController extends Controller
 
     /**
      * Upload gambar galeri
+     * Menggunakan ImageHelper untuk kompatibilitas shared hosting
      */
     private function uploadGambar($file)
     {
-        $imagesPath = ImageHelper::getImagesPath() . DIRECTORY_SEPARATOR . 'galeri';
-        
-        // Create galeri folder if not exists
-        if (!is_dir($imagesPath)) {
-            mkdir($imagesPath, 0755, true);
-        }
+        // Ensure subfolder exists with proper permissions
+        $imagesPath = ImageHelper::ensureSubfolderExists('galeri');
 
         // Generate unique filename
         $filename = 'galeri-' . time() . '-' . Str::random(10) . '.' . $file->getClientOriginalExtension();
@@ -173,9 +170,13 @@ class GaleriController extends Controller
      */
     private function deleteGambar($filename)
     {
+        if (empty($filename)) {
+            return;
+        }
+        
         $filePath = ImageHelper::getImagesPath() . DIRECTORY_SEPARATOR . 'galeri' . DIRECTORY_SEPARATOR . $filename;
         if (file_exists($filePath)) {
-            unlink($filePath);
+            @unlink($filePath);
         }
     }
 }

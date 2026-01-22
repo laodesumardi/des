@@ -3,21 +3,86 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="Website Resmi Pemerintah Desa">
-    <title>@yield('title', 'Website Resmi Pemerintah Desa')</title>
+    @php
+        use App\Models\Content;
+        use App\Helpers\ImageHelper;
+        
+        // Get settings
+        $headerNamaDesa = Content::getContent('settings', 'general', 'nama_desa') ?: Content::getContent('beranda', 'header_website', 'nama_desa', 'Pemerintah Desa');
+        $headerSubtitle = Content::getContent('settings', 'general', 'tagline') ?: Content::getContent('beranda', 'header_website', 'subtitle', 'Website Resmi Informasi Desa');
+        $metaDescription = Content::getContent('settings', 'seo', 'meta_description', 'Website Resmi Pemerintah Desa');
+        $metaKeywords = Content::getContent('settings', 'seo', 'meta_keywords', '');
+        
+        // Find header background image
+        $headerBgImage = ImageHelper::findImage('header-bg', 'https://images.unsplash.com/photo-1582213782179-e0d53f98f2ca?w=1920&q=80');
+        
+        // Find logo
+        $logoPath = null;
+        foreach (glob(public_path('images/logo-*')) as $file) {
+            $logoPath = basename($file);
+            break;
+        }
+        if (!$logoPath) {
+            foreach (glob(public_path('images/logo.*')) as $file) {
+                $logoPath = basename($file);
+                break;
+            }
+        }
+        
+        // Find favicon
+        $faviconPath = null;
+        foreach (glob(public_path('images/favicon-*')) as $file) {
+            $faviconPath = 'images/' . basename($file);
+            break;
+        }
+        if (!$faviconPath) {
+            foreach (glob(public_path('images/favicon.*')) as $file) {
+                $faviconPath = 'images/' . basename($file);
+                break;
+            }
+        }
+        
+        // Social media
+        $socialFacebook = Content::getContent('settings', 'social', 'facebook', '');
+        $socialInstagram = Content::getContent('settings', 'social', 'instagram', '');
+        $socialYoutube = Content::getContent('settings', 'social', 'youtube', '');
+        $socialTwitter = Content::getContent('settings', 'social', 'twitter', '');
+        
+        // Footer
+        $footerText = Content::getContent('settings', 'footer', 'footer_text', 'Dikelola oleh Tim IT Pemerintah Desa');
+    @endphp
+    <meta name="description" content="{{ $metaDescription }}">
+    @if($metaKeywords)
+    <meta name="keywords" content="{{ $metaKeywords }}">
+    @endif
+    <title>@yield('title', 'Website Resmi ' . $headerNamaDesa)</title>
     
-    @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <!-- Favicon -->
+    @if($faviconPath)
+    <link rel="icon" type="image/x-icon" href="{{ asset($faviconPath) }}?v={{ time() }}">
+    <link rel="shortcut icon" href="{{ asset($faviconPath) }}?v={{ time() }}">
+    @else
+    <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}">
+    @endif
+    
+    @php
+        $manifestPath = public_path('build/manifest.json');
+        $cssFile = 'build/assets/app.css';
+        $jsFile = 'build/assets/app.js';
+        
+        if (file_exists($manifestPath)) {
+            $manifest = json_decode(file_get_contents($manifestPath), true);
+            if (isset($manifest['resources/css/app.css']['file'])) {
+                $cssFile = 'build/' . $manifest['resources/css/app.css']['file'];
+            }
+            if (isset($manifest['resources/js/app.js']['file'])) {
+                $jsFile = 'build/' . $manifest['resources/js/app.js']['file'];
+            }
+        }
+    @endphp
+    <link rel="stylesheet" href="{{ asset($cssFile) }}">
+    <script src="{{ asset($jsFile) }}" defer></script>
 </head>
-@php
-    use App\Models\Content;
-    use App\Helpers\ImageHelper;
-    
-    $headerNamaDesa = Content::getContent('beranda', 'header_website', 'nama_desa', 'Pemerintah Desa');
-    $headerSubtitle = Content::getContent('beranda', 'header_website', 'subtitle', 'Website Resmi Informasi Desa');
-    
-    // Find header background image using robust helper
-    $headerBgImage = ImageHelper::findImage('header-bg', 'https://images.unsplash.com/photo-1582213782179-e0d53f98f2ca?w=1920&q=80');
-@endphp
 <body class="bg-gray-50">
     <!-- Header -->
     <header class="relative bg-[#1e3a8a] text-white header-animate overflow-hidden">
@@ -26,10 +91,14 @@
         <div class="container mx-auto px-4 py-8 md:py-12 relative z-10">
             <div class="flex items-center gap-4 md:gap-6">
                 <!-- Logo -->
-                <div class="logo-animate bg-white text-[#1e3a8a] px-4 py-3 md:px-5 md:py-4 rounded-lg flex items-center justify-center shadow-lg">
+                <div class="logo-animate bg-white text-[#1e3a8a] px-4 py-3 md:px-5 md:py-4 rounded-lg flex items-center justify-center shadow-lg overflow-hidden">
+                    @if($logoPath)
+                    <img src="{{ asset('images/' . $logoPath) }}?v={{ time() }}" alt="{{ $headerNamaDesa }}" class="w-12 h-12 md:w-16 md:h-16 object-contain">
+                    @else
                     <svg class="w-12 h-12 md:w-16 md:h-16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
                     </svg>
+                    @endif
                 </div>
                 <!-- Nama Desa -->
                 <div class="header-text-animate flex-1">
@@ -51,7 +120,18 @@
                     <a href="{{ route('pemerintahan') }}" class="menu-item-animate px-4 py-3 text-sm font-medium hover:bg-[#1e3a8a] transition-colors {{ request()->routeIs('pemerintahan') ? 'bg-[#1e3a8a] border-b-2 border-white' : '' }}">Pemerintahan</a>
                     <a href="{{ route('berita') }}" class="menu-item-animate px-4 py-3 text-sm font-medium hover:bg-[#1e3a8a] transition-colors {{ request()->routeIs('berita') ? 'bg-[#1e3a8a] border-b-2 border-white' : '' }}">Berita</a>
                     <a href="{{ route('layanan') }}" class="menu-item-animate px-4 py-3 text-sm font-medium hover:bg-[#1e3a8a] transition-colors {{ request()->routeIs('layanan') ? 'bg-[#1e3a8a] border-b-2 border-white' : '' }}">Layanan</a>
-                    <a href="{{ route('data') }}" class="menu-item-animate px-4 py-3 text-sm font-medium hover:bg-[#1e3a8a] transition-colors {{ request()->routeIs('data') ? 'bg-[#1e3a8a] border-b-2 border-white' : '' }}">Statistik</a>
+                    <div class="relative group">
+                        <button class="menu-item-animate px-4 py-3 text-sm font-medium hover:bg-[#1e3a8a] transition-colors flex items-center gap-1 {{ request()->routeIs('data') || request()->routeIs('infografis.*') ? 'bg-[#1e3a8a] border-b-2 border-white' : '' }}">
+                            Infografis
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </button>
+                        <div class="absolute left-0 mt-0 w-48 bg-white rounded-b-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                            <a href="{{ route('data') }}" class="block px-4 py-3 text-sm text-gray-700 hover:bg-[#1e3a8a] hover:text-white transition-colors {{ request()->routeIs('data') ? 'bg-[#1e3a8a] text-white' : '' }}">Statistik Umum</a>
+                            <a href="{{ route('infografis.penduduk') }}" class="block px-4 py-3 text-sm text-gray-700 hover:bg-[#1e3a8a] hover:text-white transition-colors rounded-b-lg {{ request()->routeIs('infografis.penduduk') ? 'bg-[#1e3a8a] text-white' : '' }}">Statistik Penduduk</a>
+                        </div>
+                    </div>
                     <a href="{{ route('galeri') }}" class="menu-item-animate px-4 py-3 text-sm font-medium hover:bg-[#1e3a8a] transition-colors {{ request()->routeIs('galeri') ? 'bg-[#1e3a8a] border-b-2 border-white' : '' }}">Galeri</a>
                     <a href="{{ route('umkm') }}" class="menu-item-animate px-4 py-3 text-sm font-medium hover:bg-[#1e3a8a] transition-colors {{ request()->routeIs('umkm') ? 'bg-[#1e3a8a] border-b-2 border-white' : '' }}">Ekonomi & UMKM</a>
                     <a href="{{ route('kontak') }}" class="menu-item-animate px-4 py-3 text-sm font-medium hover:bg-[#1e3a8a] transition-colors {{ request()->routeIs('kontak') ? 'bg-[#1e3a8a] border-b-2 border-white' : '' }}">Kontak</a>
@@ -72,7 +152,8 @@
                     <a href="{{ route('pemerintahan') }}" class="mobile-menu-item block px-5 py-3.5 text-base font-medium text-gray-800 hover:bg-[#1e3a8a] hover:text-white transition-colors border-b border-gray-100 {{ request()->routeIs('pemerintahan') ? 'bg-[#1e3a8a] text-white' : '' }}">Pemerintahan Desa</a>
                     <a href="{{ route('berita') }}" class="mobile-menu-item block px-5 py-3.5 text-base font-medium text-gray-800 hover:bg-[#1e3a8a] hover:text-white transition-colors border-b border-gray-100 {{ request()->routeIs('berita') ? 'bg-[#1e3a8a] text-white' : '' }}">Berita & Pengumuman</a>
                     <a href="{{ route('layanan') }}" class="mobile-menu-item block px-5 py-3.5 text-base font-medium text-gray-800 hover:bg-[#1e3a8a] hover:text-white transition-colors border-b border-gray-100 {{ request()->routeIs('layanan') ? 'bg-[#1e3a8a] text-white' : '' }}">Layanan Desa</a>
-                    <a href="{{ route('data') }}" class="mobile-menu-item block px-5 py-3.5 text-base font-medium text-gray-800 hover:bg-[#1e3a8a] hover:text-white transition-colors border-b border-gray-100 {{ request()->routeIs('data') ? 'bg-[#1e3a8a] text-white' : '' }}">Statistik</a>
+                    <a href="{{ route('data') }}" class="mobile-menu-item block px-5 py-3.5 text-base font-medium text-gray-800 hover:bg-[#1e3a8a] hover:text-white transition-colors border-b border-gray-100 {{ request()->routeIs('data') ? 'bg-[#1e3a8a] text-white' : '' }}">Statistik Umum</a>
+                    <a href="{{ route('infografis.penduduk') }}" class="mobile-menu-item block px-5 py-3.5 text-base font-medium text-gray-800 hover:bg-[#1e3a8a] hover:text-white transition-colors border-b border-gray-100 {{ request()->routeIs('infografis.penduduk') ? 'bg-[#1e3a8a] text-white' : '' }}">Statistik Penduduk</a>
                     <a href="{{ route('galeri') }}" class="mobile-menu-item block px-5 py-3.5 text-base font-medium text-gray-800 hover:bg-[#1e3a8a] hover:text-white transition-colors border-b border-gray-100 {{ request()->routeIs('galeri') ? 'bg-[#1e3a8a] text-white' : '' }}">Galeri</a>
                     <a href="{{ route('umkm') }}" class="mobile-menu-item block px-5 py-3.5 text-base font-medium text-gray-800 hover:bg-[#1e3a8a] hover:text-white transition-colors border-b border-gray-100 {{ request()->routeIs('umkm') ? 'bg-[#1e3a8a] text-white' : '' }}">Ekonomi & UMKM</a>
                     <a href="{{ route('kontak') }}" class="mobile-menu-item block px-5 py-3.5 text-base font-medium text-gray-800 hover:bg-[#1e3a8a] hover:text-white transition-colors border-b border-gray-100 {{ request()->routeIs('kontak') ? 'bg-[#1e3a8a] text-white' : '' }}">Kontak & Aspirasi</a>
@@ -80,6 +161,31 @@
             </div>
         </div>
     </nav>
+
+    <!-- Pengumuman Penting Banner (Fixed at top, below nav) -->
+    @php
+        $pengumumanAktif = \App\Models\Pengumuman::active()->penting()->latest()->first();
+    @endphp
+    @if($pengumumanAktif)
+    <div class="bg-gradient-to-r from-red-600 via-red-500 to-red-600 text-white py-3 px-4 shadow-lg" id="pengumuman-banner">
+        <div class="container mx-auto flex items-center justify-between gap-4">
+            <div class="flex items-center gap-3 flex-1 min-w-0">
+                <span class="flex-shrink-0 px-2.5 py-1 bg-white text-red-600 text-xs font-bold rounded uppercase animate-pulse shadow">
+                    <svg class="w-3 h-3 inline mr-1" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                    </svg>
+                    Penting
+                </span>
+                <p class="text-sm md:text-base font-medium truncate">{{ $pengumumanAktif->judul }}</p>
+            </div>
+            <button onclick="document.getElementById('pengumuman-banner').style.display='none'" class="flex-shrink-0 p-1.5 hover:bg-white/20 rounded-full transition-colors" aria-label="Tutup">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+            </button>
+        </div>
+    </div>
+    @endif
 
     <!-- Main Content -->
     <main class="pt-8 sm:pt-12 md:pt-16">
@@ -94,29 +200,22 @@
     @php
         $footerKontak = Content::where('page', 'kontak')->where('section', 'telepon')->get()->keyBy('key');
         $footerAlamat = Content::where('page', 'kontak')->where('section', 'alamat')->get()->keyBy('key');
-        $pengumumanAktif = \App\Models\Pengumuman::active()->penting()->latest()->first();
         $agendaMendatang = \App\Models\Agenda::upcoming()->take(3)->get();
     @endphp
     <footer class="bg-[#1e3a8a] text-white mt-16">
-        <!-- Pengumuman Penting Banner -->
-        @if($pengumumanAktif)
-        <div class="bg-yellow-500 text-yellow-900 py-2 px-4">
-            <div class="container mx-auto flex items-center gap-3">
-                <span class="px-2 py-0.5 bg-red-600 text-white text-xs font-bold rounded uppercase animate-pulse">Penting</span>
-                <p class="text-sm font-medium truncate flex-1">{{ $pengumumanAktif->judul }}</p>
-            </div>
-        </div>
-        @endif
-
         <div class="container mx-auto px-4 py-10 md:py-14">
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-10">
                 <!-- Tentang Desa -->
                 <div>
                     <div class="flex items-center gap-3 mb-4">
-                        <div class="bg-white text-[#1e3a8a] p-2 rounded-lg">
+                        <div class="bg-white text-[#1e3a8a] p-2 rounded-lg overflow-hidden">
+                            @if($logoPath)
+                            <img src="{{ asset('images/' . $logoPath) }}?v={{ time() }}" alt="{{ $headerNamaDesa }}" class="w-6 h-6 object-contain">
+                            @else
                             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
                             </svg>
+                            @endif
                         </div>
                         <h3 class="text-lg font-bold">{{ $headerNamaDesa }}</h3>
                     </div>
@@ -124,15 +223,33 @@
                         Website resmi Pemerintah Desa untuk menyampaikan informasi, kebijakan, dan layanan publik yang transparan dan akuntabel kepada seluruh masyarakat.
                     </p>
                     <div class="flex gap-3">
+                        @if($socialFacebook)
+                        <a href="{{ $socialFacebook }}" target="_blank" rel="noopener noreferrer" class="bg-white/10 hover:bg-white/20 p-2 rounded-lg transition-colors">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+                        </a>
+                        @else
                         <a href="#" class="bg-white/10 hover:bg-white/20 p-2 rounded-lg transition-colors">
                             <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
                         </a>
+                        @endif
+                        @if($socialInstagram)
+                        <a href="{{ $socialInstagram }}" target="_blank" rel="noopener noreferrer" class="bg-white/10 hover:bg-white/20 p-2 rounded-lg transition-colors">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
+                        </a>
+                        @else
                         <a href="#" class="bg-white/10 hover:bg-white/20 p-2 rounded-lg transition-colors">
                             <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/></svg>
                         </a>
+                        @endif
+                        @if($socialYoutube)
+                        <a href="{{ $socialYoutube }}" target="_blank" rel="noopener noreferrer" class="bg-white/10 hover:bg-white/20 p-2 rounded-lg transition-colors">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/></svg>
+                        </a>
+                        @else
                         <a href="#" class="bg-white/10 hover:bg-white/20 p-2 rounded-lg transition-colors">
                             <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/></svg>
                         </a>
+                        @endif
                     </div>
                 </div>
 
@@ -212,7 +329,7 @@
                     &copy; {{ date('Y') }} {{ $headerNamaDesa }}. Hak Cipta Dilindungi.
                 </p>
                 <p class="text-xs text-blue-300">
-                    Dikelola oleh Tim IT Pemerintah Desa
+                    {{ $footerText }}
                 </p>
             </div>
         </div>

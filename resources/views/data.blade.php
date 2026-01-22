@@ -117,7 +117,7 @@
                 <tbody>
                     @forelse($penduduk as $index => $p)
                         <tr class="{{ $index % 2 == 0 ? 'hover:bg-gray-50' : 'bg-gray-50 hover:bg-gray-100' }}">
-                            <td class="px-4 py-3 border border-gray-300">{{ $index + 1 }}</td>
+                            <td class="px-4 py-3 border border-gray-300">{{ $penduduk->firstItem() + $index }}</td>
                             <td class="px-4 py-3 border border-gray-300">{{ $p->nik }}</td>
                             <td class="px-4 py-3 border border-gray-300 font-medium">{{ $p->nama }}</td>
                             <td class="px-4 py-3 border border-gray-300">{{ $p->tempat_lahir }}, {{ \Carbon\Carbon::parse($p->tanggal_lahir)->format('d M Y') }}</td>
@@ -136,13 +136,111 @@
                 </tbody>
             </table>
         </div>
-        <p class="text-sm text-gray-600 mt-4 italic">
-            @if(isset($penduduk) && $penduduk->count() > 0)
+        
+        @if($penduduk->hasPages())
+            <div class="mt-6 pt-4 border-t border-gray-200">
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                    <p class="text-sm text-gray-600">
+                        Menampilkan <span class="font-medium">{{ $penduduk->firstItem() }}</span> - <span class="font-medium">{{ $penduduk->lastItem() }}</span> dari <span class="font-medium">{{ number_format($penduduk->total()) }}</span> data penduduk
+                    </p>
+                    
+                    <!-- Custom Pagination -->
+                    <div class="flex items-center gap-1">
+                        <!-- Previous Button -->
+                        @if($penduduk->onFirstPage())
+                            <span class="px-3 py-2 text-sm text-gray-400 bg-gray-100 rounded-lg cursor-not-allowed">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                                </svg>
+                            </span>
+                        @else
+                            <a href="{{ $penduduk->previousPageUrl() }}" class="px-3 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                                </svg>
+                            </a>
+                        @endif
+
+                        <!-- Page Numbers -->
+                        @php
+                            $currentPage = $penduduk->currentPage();
+                            $lastPage = $penduduk->lastPage();
+                            
+                            // Determine which pages to show
+                            $pages = [];
+                            
+                            if ($lastPage <= 7) {
+                                // Show all pages if 7 or less
+                                for ($i = 1; $i <= $lastPage; $i++) {
+                                    $pages[] = $i;
+                                }
+                            } else {
+                                // Always show first page
+                                $pages[] = 1;
+                                
+                                if ($currentPage <= 3) {
+                                    // Near the start
+                                    for ($i = 2; $i <= 4; $i++) {
+                                        $pages[] = $i;
+                                    }
+                                    $pages[] = '...';
+                                    $pages[] = $lastPage;
+                                } elseif ($currentPage >= $lastPage - 2) {
+                                    // Near the end
+                                    $pages[] = '...';
+                                    for ($i = $lastPage - 3; $i <= $lastPage; $i++) {
+                                        $pages[] = $i;
+                                    }
+                                } else {
+                                    // In the middle
+                                    $pages[] = '...';
+                                    for ($i = $currentPage - 1; $i <= $currentPage + 1; $i++) {
+                                        $pages[] = $i;
+                                    }
+                                    $pages[] = '...';
+                                    $pages[] = $lastPage;
+                                }
+                            }
+                        @endphp
+                        
+                        <div class="flex items-center gap-1">
+                            @foreach($pages as $page)
+                                @if($page == '...')
+                                    <span class="px-2 text-sm text-gray-400">...</span>
+                                @elseif($page == $currentPage)
+                                    <span class="px-3 py-2 text-sm font-medium text-white bg-[#1e3a8a] rounded-lg">
+                                        {{ $page }}
+                                    </span>
+                                @else
+                                    <a href="{{ $penduduk->url($page) }}" class="px-3 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+                                        {{ $page }}
+                                    </a>
+                                @endif
+                            @endforeach
+                        </div>
+
+                        <!-- Next Button -->
+                        @if($penduduk->hasMorePages())
+                            <a href="{{ $penduduk->nextPageUrl() }}" class="px-3 py-2 text-sm text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                                </svg>
+                            </a>
+                        @else
+                            <span class="px-3 py-2 text-sm text-gray-400 bg-gray-100 rounded-lg cursor-not-allowed">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                                </svg>
+                            </span>
+                        @endif
+                    </div>
+                </div>
+            </div>
+        @else
+            <p class="text-sm text-gray-600 mt-4 italic">
                 Menampilkan {{ $penduduk->count() }} data penduduk dari total {{ number_format($statistik['jumlah_penduduk']) }} penduduk.
-            @else
-                Belum ada data penduduk. Silakan tambahkan data dari halaman admin.
-            @endif
-        </p>
+            </p>
+        @endif
     </div>
 
 

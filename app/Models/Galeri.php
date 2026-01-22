@@ -46,14 +46,15 @@ class Galeri extends Model
     }
 
     /**
-     * Get URL gambar
+     * Get URL gambar dengan fallback untuk shared hosting
      */
     public function getGambarUrlAttribute()
     {
-        if ($this->gambar) {
-            return asset('images/galeri/' . $this->gambar);
-        }
-        return asset('images/default-galeri.jpg');
+        return \App\Helpers\ImageHelper::getImageUrl(
+            'galeri',
+            $this->gambar,
+            asset('images/default-galeri.jpg')
+        );
     }
 
     /**
