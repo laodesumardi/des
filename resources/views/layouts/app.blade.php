@@ -188,7 +188,7 @@
     @endif
 
     <!-- Main Content -->
-    <main>
+    <main class="{{ !request()->routeIs('beranda') ? 'pt-6 sm:pt-8 md:pt-10' : '' }}">
         @isset($slot)
             {{ $slot }}
         @else
