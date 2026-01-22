@@ -23,7 +23,7 @@
 
 @section('content')
 <!-- Animasi Teks Berjalan -->
-<div class="bg-gradient-to-r from-[#1e3a8a] via-blue-600 to-[#1e3a8a] text-white py-3 overflow-hidden relative">
+<div class="bg-gradient-to-r from-[#1e3a8a] via-blue-600 to-[#1e3a8a] text-white py-3 overflow-hidden relative m-0">
     <div class="marquee-container">
         <div class="marquee-content">
             <span class="marquee-text">✨ SELAMAT DATANG DI WEBSITE DESA BATU KASA ✨</span>

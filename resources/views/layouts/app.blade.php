@@ -188,7 +188,7 @@
     @endif
 
     <!-- Main Content -->
-    <main class="pt-8 sm:pt-12 md:pt-16">
+    <main>
         @isset($slot)
             {{ $slot }}
         @else
