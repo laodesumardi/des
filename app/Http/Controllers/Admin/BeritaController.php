@@ -117,11 +117,15 @@ class BeritaController extends Controller
 
         $data = [
             'judul' => $request->judul,
-            'ringkasan' => $request->ringkasan,
             'konten' => $request->konten,
             'kategori' => $request->kategori,
             'status' => $request->status,
         ];
+
+        // Handle ringkasan - hanya update jika diisi, jika kosong tetap null
+        if ($request->has('ringkasan')) {
+            $data['ringkasan'] = $request->ringkasan ?: null;
+        }
 
         // Set published_at jika status berubah ke published
         if ($request->status === 'published' && $berita->status !== 'published') {
@@ -137,12 +141,17 @@ class BeritaController extends Controller
             $data['gambar'] = $this->uploadGambar($request->file('gambar'));
         }
 
-        // Handle remove gambar
-        if ($request->has('hapus_gambar') && $request->hapus_gambar) {
+        // Handle remove gambar - hanya jika checkbox dicentang
+        if ($request->has('hapus_gambar') && $request->hapus_gambar == '1') {
             if ($berita->gambar) {
                 $this->deleteGambar($berita->gambar);
             }
             $data['gambar'] = null;
+        }
+        // Jika tidak ada file baru dan tidak ada checkbox hapus, pertahankan gambar lama
+        elseif (!$request->hasFile('gambar')) {
+            // Jangan ubah gambar jika tidak ada perubahan
+            // Gambar tetap menggunakan yang lama
         }
 
         $berita->update($data);

@@ -43,7 +43,7 @@
                     <label for="ringkasan" class="block text-sm font-semibold text-gray-700 mb-2">Ringkasan</label>
                     <textarea name="ringkasan" id="ringkasan" rows="3"
                         class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-                        placeholder="Tulis ringkasan singkat berita (opsional)...">{{ old('ringkasan', $berita->ringkasan) }}</textarea>
+                        placeholder="Tulis ringkasan singkat berita (opsional)...">{{ old('ringkasan', $berita->ringkasan ?? '') }}</textarea>
                     <p class="text-xs text-gray-500 mt-1">Maksimal 500 karakter. Jika kosong, akan diambil dari awal konten.</p>
                     @error('ringkasan')
                     <p class="text-red-500 text-sm mt-1">{{ $message }}</p>
