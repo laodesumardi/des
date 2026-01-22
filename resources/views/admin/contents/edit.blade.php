@@ -19,19 +19,6 @@
         </div>
     </div>
 
-    @if(session('success'))
-        <div class="bg-green-50 border-l-4 border-green-500 text-green-700 p-4 mb-6 rounded" role="alert">
-            <p class="font-bold">{{ session('success') }}</p>
-        </div>
-    @endif
-
-    @if(session('error'))
-        <div class="bg-red-50 border-l-4 border-red-500 text-red-700 p-4 mb-6 rounded" role="alert">
-            <p class="font-bold">{{ session('error') }}</p>
-        </div>
-    @endif
-
-
     <form method="POST" action="{{ route('admin.contents.update', $page) }}" id="content-form" enctype="multipart/form-data">
         @csrf
         @method('PUT')
@@ -1217,9 +1204,14 @@
                                     <button type="button" class="update-perangkat-btn px-3 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors text-xs font-medium" data-id="{{ $perangkat->id }}">
                                         Update
                                     </button>
-                                    <button type="button" class="delete-perangkat-btn px-3 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-xs font-medium" data-id="{{ $perangkat->id }}">
+                                    <button type="button" class="delete-perangkat-btn px-3 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors text-xs font-medium" data-id="{{ $perangkat->id }}" data-nama="{{ addslashes($perangkat->nama) }}">
                                         Hapus
                                     </button>
+                                    <!-- Form tersembunyi untuk delete perangkat desa -->
+                                    <form id="delete-perangkat-form-{{ $perangkat->id }}" action="{{ route('admin.perangkat-desa.destroy', $perangkat->id) }}" method="POST" class="hidden">
+                                        @csrf
+                                        @method('DELETE')
+                                    </form>
                                 </div>
                             </div>
                         </div>
@@ -2024,35 +2016,72 @@
         });
     });
 
-    // Delete Perangkat Desa
+    // Delete Perangkat Desa dengan modal popup
+    let pendingDeletePerangkatId = null;
+    
+    function openDeletePerangkatModal(id, nama) {
+        const modal = document.getElementById('delete-modal');
+        const modalContent = document.getElementById('delete-modal-content');
+        const modalForm = document.getElementById('delete-modal-form');
+        const modalMessage = document.getElementById('delete-modal-message');
+        
+        if (!modal) return;
+        
+        // Set message
+        modalMessage.textContent = 'Apakah Anda yakin ingin menghapus perangkat desa "' + nama + '"? Tindakan ini tidak dapat dibatalkan.';
+        
+        // Simpan ID yang akan dihapus
+        pendingDeletePerangkatId = id;
+        
+        // Clear form action untuk mencegah submit normal
+        modalForm.action = '#';
+        modalForm.onsubmit = function(e) {
+            e.preventDefault();
+            executeDeletePerangkat(id);
+        };
+        
+        // Show modal
+        modal.classList.remove('hidden');
+        setTimeout(() => {
+            modalContent.classList.remove('opacity-0', 'scale-95');
+            modalContent.classList.add('opacity-100', 'scale-100');
+        }, 10);
+    }
+    
+    function executeDeletePerangkat(id) {
+        const formData = new FormData();
+        formData.append('_token', '{{ csrf_token() }}');
+        formData.append('_method', 'DELETE');
+        
+        fetch(`{{ url('admin/perangkat-desa') }}/${id}`, {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            closeDeleteModal();
+            if (data.success) {
+                document.querySelector(`.perangkat-item[data-id="${id}"]`).remove();
+                // Reload halaman untuk refresh data
+                setTimeout(() => {
+                    location.reload();
+                }, 500);
+            } else {
+                alert('Gagal menghapus perangkat desa');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            closeDeleteModal();
+            alert('Terjadi kesalahan');
+        });
+    }
+    
     document.querySelectorAll('.delete-perangkat-btn').forEach(btn => {
         btn.addEventListener('click', function() {
-            if (!confirm('Apakah Anda yakin ingin menghapus perangkat desa ini?')) {
-                return;
-            }
-            
             const id = this.dataset.id;
-            const formData = new FormData();
-            formData.append('_token', '{{ csrf_token() }}');
-            formData.append('_method', 'DELETE');
-            
-            fetch(`{{ url('admin/perangkat-desa') }}/${id}`, {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    document.querySelector(`.perangkat-item[data-id="${id}"]`).remove();
-                    alert('Perangkat desa berhasil dihapus!');
-                } else {
-                    alert('Gagal menghapus perangkat desa');
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('Terjadi kesalahan');
-            });
+            const nama = this.dataset.nama || 'perangkat desa ini';
+            openDeletePerangkatModal(id, nama);
         });
     });
 
