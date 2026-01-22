@@ -91,7 +91,7 @@
         <div class="container mx-auto px-4 py-8 md:py-12 relative z-10">
             <div class="flex items-center gap-4 md:gap-6">
                 <!-- Logo -->
-                <div class="logo-animate bg-white text-[#1e3a8a] px-4 py-3 md:px-5 md:py-4 rounded-lg flex items-center justify-center shadow-lg overflow-hidden">
+                <div class="logo-animate px-4 py-3 md:px-5 md:py-4 flex items-center justify-center overflow-hidden">
                     @if($logoPath)
                     <img src="{{ asset('images/' . $logoPath) }}?v={{ time() }}" alt="{{ $headerNamaDesa }}" class="w-12 h-12 md:w-16 md:h-16 object-contain">
                     @else
@@ -208,7 +208,7 @@
                 <!-- Tentang Desa -->
                 <div>
                     <div class="flex items-center gap-3 mb-4">
-                        <div class="bg-white text-[#1e3a8a] p-2 rounded-lg overflow-hidden">
+                        <div class="p-2 overflow-hidden">
                             @if($logoPath)
                             <img src="{{ asset('images/' . $logoPath) }}?v={{ time() }}" alt="{{ $headerNamaDesa }}" class="w-6 h-6 object-contain">
                             @else
