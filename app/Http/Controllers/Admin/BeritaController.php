@@ -178,12 +178,23 @@ class BeritaController extends Controller
     {
         // Ensure subfolder exists with proper permissions
         $imagesPath = ImageHelper::ensureSubfolderExists('berita');
+        
+        // Pastikan folder writable
+        if (!is_writable($imagesPath)) {
+            chmod($imagesPath, 0755);
+        }
 
         // Generate unique filename
         $filename = 'berita-' . time() . '-' . Str::random(10) . '.' . $file->getClientOriginalExtension();
         
         // Move file
         $file->move($imagesPath, $filename);
+        
+        // Set permission file (644 = readable oleh semua)
+        $filePath = $imagesPath . DIRECTORY_SEPARATOR . $filename;
+        if (file_exists($filePath)) {
+            chmod($filePath, 0644);
+        }
 
         return $filename;
     }

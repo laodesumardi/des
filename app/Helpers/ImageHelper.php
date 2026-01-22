@@ -220,8 +220,24 @@ class ImageHelper
         $subfolder = trim($subfolder, '/');
         $fullPath = public_path('images/' . $subfolder);
         
+        // Buat folder jika belum ada
         if (!is_dir($fullPath)) {
             @mkdir($fullPath, 0755, true);
+        }
+        
+        // Pastikan permission benar dan writable
+        if (is_dir($fullPath)) {
+            // Set permission 755 jika belum
+            $currentPerms = fileperms($fullPath);
+            $expectedPerms = 0755;
+            if (($currentPerms & 0777) !== $expectedPerms) {
+                @chmod($fullPath, $expectedPerms);
+            }
+            
+            // Pastikan writable
+            if (!is_writable($fullPath)) {
+                @chmod($fullPath, 0755);
+            }
         }
         
         return $fullPath;

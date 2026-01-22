@@ -180,12 +180,23 @@ class UmkmController extends Controller
     {
         // Ensure subfolder exists with proper permissions
         $imagesPath = ImageHelper::ensureSubfolderExists('umkm');
+        
+        // Pastikan folder writable
+        if (!is_writable($imagesPath)) {
+            chmod($imagesPath, 0755);
+        }
 
         // Generate unique filename
         $filename = 'umkm-' . time() . '-' . Str::random(10) . '.' . $file->getClientOriginalExtension();
         
         // Move file
         $file->move($imagesPath, $filename);
+        
+        // Set permission file (644 = readable oleh semua)
+        $filePath = $imagesPath . DIRECTORY_SEPARATOR . $filename;
+        if (file_exists($filePath)) {
+            chmod($filePath, 0644);
+        }
 
         return $filename;
     }
